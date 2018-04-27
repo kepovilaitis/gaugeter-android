@@ -2,5 +2,12 @@
 <resources>
 
     <item type="id" name="main_content" />
+    <item type="id" name="list_view" />
+    <item type="id" name="text_empty" />
+    <item type="id" name="fab" />
+    <item type="id" name="text_name" />
+    <item type="id" name="text_status" />
+    <item type="id" name="text_address" />
+    <item type="id" name="image_view" />
 
 </resources>

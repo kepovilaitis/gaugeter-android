@@ -1,9 +1,12 @@
-package com.example.kestutis.cargauges;
+package com.example.kestutis.cargauges.activities;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+
+import com.example.kestutis.cargauges.fragments.GaugesInfoFragment;
+import com.example.kestutis.cargauges.R;
 
 public class MainActivity extends AppCompatActivity {
 
