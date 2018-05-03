@@ -9,5 +9,8 @@
     <item type="id" name="text_status" />
     <item type="id" name="text_address" />
     <item type="id" name="image_view" />
+    <item type="id" name="oil_gauge"/>
+    <item type="id" name="water_temp_gauge"/>
+    <item type="id" name="charge_gauge"/>
 
 </resources>

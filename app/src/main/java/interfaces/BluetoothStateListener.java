@@ -1,4 +1,4 @@
-package com.example.kestutis.cargauges.interfaces;
+package interfaces;
 
 import android.content.Intent;
 

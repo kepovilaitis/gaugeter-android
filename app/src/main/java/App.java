@@ -3,8 +3,8 @@ package com.example.kestutis.cargauges;
 import android.app.Application;
 import android.content.Context;
 
-import com.example.kestutis.cargauges.controllers.AnimationController;
-import com.example.kestutis.cargauges.controllers.BluetoothController;
+import controllers.AnimationController;
+import controllers.BluetoothController;
 
 public class App extends Application {
 

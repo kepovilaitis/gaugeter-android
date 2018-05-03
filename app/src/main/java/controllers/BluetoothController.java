@@ -1,4 +1,4 @@
-package com.example.kestutis.cargauges.controllers;
+package controllers;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import com.example.kestutis.cargauges.interfaces.BluetoothStateListener;
+import interfaces.BluetoothStateListener;
 
 import java.util.ArrayList;
 import java.util.List;

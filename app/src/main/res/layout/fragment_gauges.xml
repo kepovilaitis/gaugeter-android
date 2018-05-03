@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:gauge="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/colorPrimary">
+
+    <views.GaugeView
+        android:id="@id/oil_gauge"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_margin="20dp"
+        gauge:needleWidth="0.010"
+        gauge:needleHeight="0.40"
+        gauge:scaleStartValue="0"
+        gauge:scaleEndValue="100"
+        gauge:showScale="false"
+        gauge:showRanges="true"
+        gauge:divisions="10"
+        gauge:showText="false"
+        gauge:subdivisions="4"/>
+
+</LinearLayout>

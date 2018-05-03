@@ -1,4 +1,4 @@
-package com.example.kestutis.cargauges.adapters;
+package adapters;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -12,12 +12,13 @@ import com.example.kestutis.cargauges.R;
 
 import java.util.List;
 
+import holders.DeviceInfoHolder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 public class DeviceListAdapter extends BaseAdapter {
-    private List<BluetoothDevice> _devices;
+    private List<DeviceInfoHolder> _devices;
     private Context _context;
 
     @Override
@@ -27,7 +28,7 @@ public class DeviceListAdapter extends BaseAdapter {
     }
 
     @Override
-    public BluetoothDevice getItem(int position) {
+    public DeviceInfoHolder getItem(int position) {
         return _devices.get(position);
     }
 
@@ -45,7 +46,7 @@ public class DeviceListAdapter extends BaseAdapter {
             view.setTag(new ViewHolder(view));
         }
 
-        BluetoothDevice device = getItem(position);
+        DeviceInfoHolder device = getItem(position);
 
         if (device == null) {
             return view;
@@ -54,7 +55,7 @@ public class DeviceListAdapter extends BaseAdapter {
         ViewHolder holder = (ViewHolder) view.getTag();
         holder.getTextName().setText(device.getName());
         holder.getTextAddress().setText(device.getAddress());
-        holder.getTextStatus().setText(device.getBondState());
+        holder.getTextStatus().setText("Bonding");
 
         return view;
     }

@@ -1,4 +1,4 @@
-package com.example.kestutis.cargauges.controllers;
+package controllers;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;

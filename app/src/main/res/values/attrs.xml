@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="GaugeView">
+        <attr name="showScale" format="boolean" />
+        <attr name="showRanges" format="boolean" />
+
+        <attr name="needleWidth" format="float" />
+        <attr name="needleHeight" format="float" />
+
+        <attr name="scalePosition" format="float" />
+        <attr name="scaleStartValue" format="float" />
+        <attr name="scaleEndValue" format="float" />
+        <attr name="scaleStartAngle" format="float" />
+        <attr name="scaleEndAngle" format="float" />
+
+        <attr name="divisions" format="integer" />
+        <attr name="subdivisions" format="integer" />
+
+        <attr name="rangeValues" format="reference" />
+        <attr name="rangeColors" format="reference" />
+    </declare-styleable>
+
+</resources>
