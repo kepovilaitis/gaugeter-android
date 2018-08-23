@@ -1,49 +1,52 @@
 package fragments;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.DialogInterface;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.Nullable;
+import android.support.design.widget.*;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AlertDialog.Builder;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.TextWatcher;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 
-import controllers.AnimationController;
+
 import controllers.BluetoothController;
+import helper.TouchHelperCallback;
 import holders.DeviceInfoHolder;
-import interfaces.BluetoothStateListener;
 import constants.Constants;
+import interfaces.BluetoothStateListener;
+
 import adapters.DeviceListAdapter;
 import com.example.kestutis.cargauges.R;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-
-public class DevicesFragment extends Fragment {
+public class DevicesFragment extends Fragment{
     private BluetoothController _bluetooth;
-    private AnimationController _animation;
     private FloatingActionButton _fab;
     private DeviceListAdapter _adapter;
-    private DeviceInfoHolder _selectedDevice;
+    private RecyclerView _deviceList;
 
-    DeviceInfoHolder device = new DeviceInfoHolder("Device1", "00:11:22:33:44", BluetoothDevice.BOND_BONDING);
-    private List<DeviceInfoHolder> _devices = new LinkedList<>(Arrays.asList(device));
+
+    DeviceInfoHolder device = new DeviceInfoHolder("Toyota 80", "00:11:22:33:44", BluetoothDevice.BOND_BONDING);
+    DeviceInfoHolder device2 = new DeviceInfoHolder("BMW 320i", "25:65:65:44:77", BluetoothDevice.BOND_BONDING);
+    DeviceInfoHolder device3 = new DeviceInfoHolder("BMW 328i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
+
+    private List<DeviceInfoHolder> _devices = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -51,43 +54,53 @@ public class DevicesFragment extends Fragment {
 
         _bluetooth = BluetoothController.getInstance();
         _bluetooth.setBtStateListener(_btStateListener);
-        _animation = AnimationController.getInstance();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View main = inflater.inflate(R.layout.fragment_devices, container, false);
-        ListView deviceList = main.findViewById(R.id.list_view);
+        _deviceList = main.findViewById(R.id.paired_device_list_view);
+        Button searchButton = main.findViewById(R.id.search_button);
+        EditText searchEditText = main.findViewById(R.id.search);
+
+        searchButton.setOnClickListener(_searchListener);
 
         _fab = main.findViewById(R.id.fab);
-        _fab.setImageResource(_bluetooth.isBluetoothOn() ? R.drawable.ic_radar : R.drawable.ic_bluetooth_off_white_48dp);
+        _fab.setImageResource(R.drawable.ic_bluetooth_connect_white_48dp);
         _fab.setOnClickListener(_fabOnClickListener);
+        _fab.hide();
 
-        deviceList.setEmptyView(main.findViewById(R.id.text_empty));
-        _adapter = new DeviceListAdapter(/*_bluetooth.getFoundDevices()*/ _devices, getActivity());
-        deviceList.setAdapter(_adapter);
-        deviceList.setOnItemLongClickListener(_itemLongClickListener);
-        deviceList.setOnItemClickListener(_itemClickListener);
+        if (isAdded()) {
+            _deviceList.setLayoutManager(new LinearLayoutManager(getActivity()));
+            _deviceList.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        }
+
+        _devices.add(device);
+        _devices.add(device2);
+        _devices.add(device3);
+
+        _adapter = new DeviceListAdapter(/*_bluetooth.getBondedDevices()*/_devices, _fab);
+        _deviceList.setAdapter(_adapter);
+        ItemTouchHelper.Callback callback = new TouchHelperCallback(_adapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(_deviceList);
+
+        searchEditText.addTextChangedListener(_queryTextListener);
 
         return main;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
     }
 
     private OnClickListener _fabOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (_selectedDevice != null){
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.add(R.id.main_content, new GaugesFragment());
-                fragmentTransaction.commit();
-            } else if (_bluetooth.isBluetoothOn()) {
-                _bluetooth.startDiscovery();
-
-                Snackbar.make(v, "Bluetooth is On, Scanning", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            } else {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, Constants.REQUEST_ENABLE_BT);
-            }
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.main_content, new GaugesFragment());
+            fragmentTransaction.commit();
         }
     };
 
@@ -104,54 +117,39 @@ public class DevicesFragment extends Fragment {
 
         @Override
         public void setFAB(Intent intent) {
-            _animation.setFAB(intent, _fab, getActivity());
+            //_animation.setFAB(intent, _fab, getActivity());
         }
     };
 
-    private OnItemLongClickListener _itemLongClickListener = new OnItemLongClickListener() {
+    private OnClickListener _searchListener = new OnClickListener() {
         @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        public void onClick(View v) {
+            if (_bluetooth.isBluetoothOn()) {
+                _bluetooth.startDiscovery();
 
-            AlertDialog alertDialog = new Builder(getActivity()).create();
-            alertDialog.setTitle("Delete");
-            alertDialog.setMessage("Are you sure you want to delete");
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new ConfirmDeleteBtnClick(/*_bluetooth.getDevices()*/_devices.get(position)));
-            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", new ConfirmDeleteBtnClick(/*_bluetooth.getDevices()*/_devices.get(position)));
-            alertDialog.show();
-
-            return true;
-        }
-    };
-
-    private OnItemClickListener _itemClickListener = new OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            _selectedDevice = _devices.get(position);
-            _fab.setImageResource(R.drawable.ic_bluetooth_connect_white_48dp);
-            parent.setSelected(!parent.isSelected());
-
-        }
-    };
-
-    @AllArgsConstructor
-    private class ConfirmDeleteBtnClick implements DialogInterface.OnClickListener {
-        //private BluetoothDevice device;
-        private DeviceInfoHolder device;
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            switch (which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    /*_bluetooth.delete(device);
-                    _adapter.notifyDataSetChanged();*/
-
-                    _devices.remove(device);
-                    _adapter.notifyDataSetChanged();
-                    break;
-                case DialogInterface.BUTTON_NEGATIVE:
-
-                    break;
+                Snackbar.make(v, "Bluetooth is On, Scanning", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            } else {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, Constants.REQUEST_ENABLE_BT);
             }
         }
-    }
+    };
+
+    private TextWatcher _queryTextListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            _adapter.getFilter().filter(s);
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
 }

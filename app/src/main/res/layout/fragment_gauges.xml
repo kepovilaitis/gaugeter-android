@@ -2,23 +2,96 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:gauge="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/colorPrimary">
 
-    <views.GaugeView
-        android:id="@id/oil_gauge"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_margin="20dp"
-        gauge:needleWidth="0.010"
-        gauge:needleHeight="0.40"
-        gauge:scaleStartValue="0"
-        gauge:scaleEndValue="100"
-        gauge:showScale="false"
-        gauge:showRanges="true"
-        gauge:divisions="10"
-        gauge:showText="false"
-        gauge:subdivisions="4"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingBottom="40dp">
+
+        <views.GaugeView
+            android:id="@id/oil_gauge"
+            android:layout_width="360dp"
+            android:layout_height="240dp"
+            android:layout_margin="10dp"
+            app:divisions="10"
+            app:gaugeRedSide="left"
+            app:gaugeType="round"
+            app:redDivisions="7"
+            app:scaleEndValue="200"
+            app:scaleStartValue="0"
+            app:showScaleValues="true"
+            app:showText="false"
+            app:subdivisions="4" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingBottom="40dp">
+
+        <views.GaugeView
+            android:id="@id/water_temp_gauge"
+            android:layout_width="180dp"
+            android:layout_height="120dp"
+            android:layout_margin="10dp"
+            app:divisions="10"
+            app:gaugeRedSide="left"
+            app:gaugeType="round"
+            app:redDivisions="7"
+            app:scaleEndValue="200"
+            app:scaleStartValue="0"
+            app:showScaleValues="true"
+            app:showText="false"
+            app:subdivisions="10" />
+
+        <views.GaugeView
+            android:id="@id/charge_gauge"
+            android:layout_width="180dp"
+            android:layout_height="120dp"
+            android:layout_margin="10dp"
+            app:divisions="10"
+            app:gaugeRedSide="left"
+            app:gaugeType="round"
+            app:redDivisions="7"
+            app:scaleEndValue="200"
+            app:scaleStartValue="0"
+            app:showScaleValues="true"
+            app:showText="false"
+            app:subdivisions="10" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingBottom="40dp">
+
+        <views.GaugeView
+            android:id="@id/oil_temp_gauge"
+            android:layout_width="180dp"
+            android:layout_height="120dp"
+            android:layout_margin="10dp"
+            app:divisions="10"
+            app:gaugeRedSide="left"
+            app:gaugeType="round"
+            app:redDivisions="7"
+            app:scaleEndValue="200"
+            app:scaleStartValue="0"
+            app:showScaleValues="true"
+            app:showText="false"
+            app:subdivisions="10" />
+
+    </LinearLayout>
 
 </LinearLayout>

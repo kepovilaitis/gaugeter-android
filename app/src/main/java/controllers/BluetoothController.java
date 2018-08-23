@@ -10,8 +10,9 @@ import android.util.Log;
 
 import interfaces.BluetoothStateListener;
 
-import java.util.ArrayList;
+import java.util.Set;
 import java.util.List;
+import java.util.ArrayList;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,8 +22,10 @@ import lombok.Setter;
 public class BluetoothController {
     @Getter private static BluetoothController _instance;
     private BluetoothAdapter _adapter;
-    @Getter private List<BluetoothDevice> _foundDevices;
+    private Set<BluetoothDevice> _foundDevices;
+    private Set<BluetoothDevice> _bondedDevices;
     @Setter private BluetoothStateListener _btStateListener;
+
 
     public static void setInstance(Context base) {
         _instance = new BluetoothController(base);
@@ -31,11 +34,20 @@ public class BluetoothController {
     private BluetoothController(Context base) {
         _adapter = BluetoothAdapter.getDefaultAdapter();
         base.registerReceiver(_btReceiver, getFilter());
-        _foundDevices = new ArrayList<>();
+        //_bondedDevices = _adapter.getBondedDevices();
+    }
+
+    public List<BluetoothDevice> getFoundDevices() {
+        return new ArrayList<>(_foundDevices);
+    }
+
+    public List<BluetoothDevice> getBondedDevices() {
+        return new ArrayList<>(_bondedDevices);
     }
 
     public boolean isBluetoothOn() {
-        return _adapter.isEnabled();
+        //return _adapter.isEnabled();
+        return true;
     }
 
     public boolean isDeviceConnected(String address) {
@@ -53,16 +65,12 @@ public class BluetoothController {
         }
     }
 
-    public List<BluetoothDevice> getDevices(){
-        if (_foundDevices.size() == 0){
-            _foundDevices.addAll(_adapter.getBondedDevices());
-        }
-        return _foundDevices;
-    }
-
     private void addDevice(Intent intent) {
         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        _foundDevices.add(device);
+
+        if (device.getName().contains("car-gauges")) {
+            _foundDevices.add(device);
+        }
     }
 
     public void delete(BluetoothDevice device){

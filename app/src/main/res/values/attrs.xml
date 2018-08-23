@@ -2,23 +2,28 @@
 <resources>
 
     <declare-styleable name="GaugeView">
-        <attr name="showScale" format="boolean" />
-        <attr name="showRanges" format="boolean" />
-
-        <attr name="needleWidth" format="float" />
-        <attr name="needleHeight" format="float" />
+        <attr name="showScaleValues" format="boolean" />
 
         <attr name="scalePosition" format="float" />
         <attr name="scaleStartValue" format="float" />
         <attr name="scaleEndValue" format="float" />
-        <attr name="scaleStartAngle" format="float" />
-        <attr name="scaleEndAngle" format="float" />
 
         <attr name="divisions" format="integer" />
         <attr name="subdivisions" format="integer" />
 
-        <attr name="rangeValues" format="reference" />
-        <attr name="rangeColors" format="reference" />
+        <attr name="gaugeRedSide" format="enum">
+            <enum name="left" value="0"/>
+            <enum name="right" value="1"/>
+            <enum name="both" value="2"/>
+        </attr>
+
+        <attr name="gaugeType" format="enum">
+            <enum name="horizontal" value="0"/>
+            <enum name="verticalLeft" value="1"/>
+            <enum name="verticalRight" value="2"/>
+            <enum name="round" value="3"/>
+        </attr>
+        <attr name="redDivisions" format="integer" />
     </declare-styleable>
 
 </resources>
