@@ -1,5 +1,6 @@
 package adapters;
 
+import android.graphics.drawable.*;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -7,9 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filterable;
-import android.widget.Filter;
-import android.widget.TextView;
+import android.view.animation.*;
+import android.widget.*;
 
 import com.example.kestutis.cargauges.R;
 
@@ -30,6 +30,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
     private int _selectedPos = -1;
     private BluetoothController _bluetoothController;
     private View _view;
+    private ProgressBar _progressBar;
 
     public DeviceListAdapter(List<DeviceInfoHolder> devices, FloatingActionButton fab){
         _devices = devices;
@@ -54,6 +55,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
         viewHolder._textName.setText(device.getName());
         viewHolder._textAddress.setText(device.getAddress());
         viewHolder._textStatus.setText("Bonding");
+        _progressBar = viewHolder._progressBar;
     }
 
     @Override
@@ -111,6 +113,10 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
         return _devices.get(_selectedPos);
     }*/
 
+    public void startProgressBar(){
+        _progressBar.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
         Collections.swap(_devices, fromPosition, toPosition);
@@ -156,10 +162,10 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
 
     @Getter
     class ViewHolder extends RecyclerView.ViewHolder {
-
         TextView _textName;
         TextView _textAddress;
         TextView _textStatus;
+        ProgressBar _progressBar;
 
         ViewHolder(final View itemView) {
             super(itemView);
@@ -167,6 +173,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
             _textName = itemView.findViewById(R.id.text_name);
             _textAddress = itemView.findViewById(R.id.text_address);
             _textStatus = itemView.findViewById(R.id.text_status);
+            _progressBar = itemView.findViewById(R.id.progress_bar);
 
             // Handle item click and set the selection
             itemView.setOnClickListener(new View.OnClickListener() {

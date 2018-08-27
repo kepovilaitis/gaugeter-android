@@ -153,11 +153,9 @@ public class GaugeView extends View {
 
         if (_newValue > _oldValue && _newValue - _oldValue >= 2){
             _oldValue += 2;
-            Log.d("oldValue: " + String.valueOf(_oldValue), "newValue" + String.valueOf(_newValue));
             return  2.0f;
         } else if (_newValue <= _oldValue && _newValue - _oldValue <= -2){
             _oldValue -= 2;
-            Log.d("oldValue: " + String.valueOf(_oldValue), "newValue" + String.valueOf(_newValue));
             return  -2.0f;
         } else {
             return 0.0f;

@@ -15,6 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:orientation="horizontal"
+            android:focusableInTouchMode="true"
             android:background="@drawable/search_bar"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
@@ -26,17 +27,21 @@
             
             <EditText
                 android:id="@id/search"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="7"
+                android:layout_height="match_parent"
                 android:textCursorDrawable="@drawable/text_cursor"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_size_big"
                 android:hint="@string/search"
+                android:maxLines="1"
+                android:background="@null"
                 android:textColorHint="@color/white"/>
             
             <ImageView
-                android:layout_width="40dp"
+                android:layout_width="0dp"
                 android:layout_height="40dp"
+                android:layout_weight="1"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_magnify_48dp"
                 android:layout_gravity="center_vertical|end"/>

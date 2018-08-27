@@ -3,7 +3,7 @@ package fragments;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.os.Bundle;
+import android.os.*;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.*;
@@ -15,13 +15,9 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextWatcher;
 import android.text.Editable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-
+import android.widget.*;
 
 import controllers.BluetoothController;
 import helper.TouchHelperCallback;
@@ -32,13 +28,13 @@ import interfaces.BluetoothStateListener;
 import adapters.DeviceListAdapter;
 import com.example.kestutis.cargauges.R;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class DevicesFragment extends Fragment{
     private BluetoothController _bluetooth;
     private FloatingActionButton _fab;
     private DeviceListAdapter _adapter;
+    private ProgressBar _progressBar;
     private RecyclerView _deviceList;
 
 
@@ -52,6 +48,7 @@ public class DevicesFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
+
         _bluetooth = BluetoothController.getInstance();
         _bluetooth.setBtStateListener(_btStateListener);
     }
@@ -63,11 +60,13 @@ public class DevicesFragment extends Fragment{
         Button searchButton = main.findViewById(R.id.search_button);
         EditText searchEditText = main.findViewById(R.id.search);
 
+        setHasOptionsMenu(true);
+
         searchButton.setOnClickListener(_searchListener);
 
         _fab = main.findViewById(R.id.fab);
-        _fab.setImageResource(R.drawable.ic_bluetooth_connect_white_48dp);
         _fab.setOnClickListener(_fabOnClickListener);
+        _fab.setImageResource(R.drawable.ic_bluetooth_connect_white_48dp);
         _fab.hide();
 
         if (isAdded()) {
@@ -90,17 +89,28 @@ public class DevicesFragment extends Fragment{
         return main;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState){
-        super.onActivityCreated(savedInstanceState);
-    }
+    private final CountDownTimer mTimer = new CountDownTimer(5000, 1500) {
+        @Override
+        public void onTick(final long millisUntilFinished) {
+
+        }
+
+        @Override
+        public void onFinish() {
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.main_content, new GaugesFragment());
+            fragmentTransaction.commit();
+        }
+    };
 
     private OnClickListener _fabOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            _adapter.startProgressBar();
+            mTimer.start();
+            /*FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.main_content, new GaugesFragment());
-            fragmentTransaction.commit();
+            fragmentTransaction.commit();*/
         }
     };
 

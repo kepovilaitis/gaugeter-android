@@ -18,7 +18,7 @@
     <item type="id" name="search"/>
     <item type="id" name="search_button"/>
     <item type="id" name="relative_layout"/>
-    <item type="id" name="view_background"/>
-    <item type="id" name="view_foreground"/>
+    <item type="id" name="progress_bar"/>
+    <item type="id" name="action_settings"/>
 
 </resources>
