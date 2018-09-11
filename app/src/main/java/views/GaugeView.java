@@ -45,10 +45,11 @@ public class GaugeView extends View {
 
     private boolean _showScaleValues;
 
-    private float _newValue = 0.0f;
-    private float _oldValue = 0.0f;
+    private double _newValue = 0.0;
+    private double _oldValue = 0.0;
 
     private Matrix _matrix;
+    private Context _context;
 
     public GaugeView(Context context) {
         this(context, null, 0);
@@ -61,6 +62,7 @@ public class GaugeView extends View {
     public GaugeView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         readAttrs(context, attrs, defStyleAttr);
+        _context = context;
         _matrix = new Matrix();
         this.postInvalidate();
         init();
@@ -143,10 +145,13 @@ public class GaugeView extends View {
         invalidate();
     }
 
-
-    public void setValue(float value) {
+    public void setValue(double value) {
         _newValue = value;
         invalidate();
+    }
+
+    public double getValue(){
+        return _newValue;
     }
 
     private float countDegrees(){
@@ -243,7 +248,7 @@ public class GaugeView extends View {
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(0.005f);
             paint.setTextSize(0.05f);
-            paint.setTypeface(Typeface.SANS_SERIF);
+            paint.setTypeface(Typeface.createFromAsset(_context.getAssets(),"font/worksans_regular.ttf"));
             paint.setTextAlign(Align.CENTER);
             paint.setShadowLayer(0.005f, 0.002f, 0.002f, 0);
 

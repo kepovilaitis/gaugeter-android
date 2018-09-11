@@ -2,10 +2,10 @@ package fragments;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothAdapter;
-import android.content.Intent;
-import android.os.*;
+import android.content.*;
+import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.*;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -15,9 +15,13 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextWatcher;
 import android.text.Editable;
-import android.view.*;
+import android.view.View;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.widget.EditText;
+import android.widget.Button;
+
 
 import controllers.BluetoothController;
 import helper.TouchHelperCallback;
@@ -26,21 +30,28 @@ import constants.Constants;
 import interfaces.BluetoothStateListener;
 
 import adapters.DeviceListAdapter;
+import lombok.*;
+
 import com.example.kestutis.cargauges.R;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class DevicesFragment extends Fragment{
     private BluetoothController _bluetooth;
-    private FloatingActionButton _fab;
     private DeviceListAdapter _adapter;
-    private ProgressBar _progressBar;
-    private RecyclerView _deviceList;
+    private Context _context;
 
-
-    DeviceInfoHolder device = new DeviceInfoHolder("Toyota 80", "00:11:22:33:44", BluetoothDevice.BOND_BONDING);
+    DeviceInfoHolder device = new DeviceInfoHolder("Pradzia", "00:11:22:33:44", BluetoothDevice.BOND_BONDING);
     DeviceInfoHolder device2 = new DeviceInfoHolder("BMW 320i", "25:65:65:44:77", BluetoothDevice.BOND_BONDING);
     DeviceInfoHolder device3 = new DeviceInfoHolder("BMW 328i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
+    DeviceInfoHolder device4 = new DeviceInfoHolder("BMW 318i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
+    DeviceInfoHolder device5 = new DeviceInfoHolder("BMW 323i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
+    DeviceInfoHolder device6 = new DeviceInfoHolder("VW Sharan", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
+    DeviceInfoHolder device7 = new DeviceInfoHolder("BMW 328i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
+    DeviceInfoHolder device8 = new DeviceInfoHolder("BMW 328i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
+    DeviceInfoHolder device9 = new DeviceInfoHolder("Galas", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
+
 
     private List<DeviceInfoHolder> _devices = new ArrayList<>();
 
@@ -48,41 +59,46 @@ public class DevicesFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-
         _bluetooth = BluetoothController.getInstance();
-        _bluetooth.setBtStateListener(_btStateListener);
+        //_bluetooth.setBtStateListener(_btStateListener);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View main = inflater.inflate(R.layout.fragment_devices, container, false);
-        _deviceList = main.findViewById(R.id.paired_device_list_view);
+        RecyclerView deviceList = main.findViewById(R.id.paired_device_list_view);
         Button searchButton = main.findViewById(R.id.search_button);
         EditText searchEditText = main.findViewById(R.id.search);
+        FloatingActionButton fab = main.findViewById(R.id.fab);
+
+        if (isAdded()) {
+            _context = getContext();
+        }
 
         setHasOptionsMenu(true);
 
         searchButton.setOnClickListener(_searchListener);
 
-        _fab = main.findViewById(R.id.fab);
-        _fab.setOnClickListener(_fabOnClickListener);
-        _fab.setImageResource(R.drawable.ic_bluetooth_connect_white_48dp);
-        _fab.hide();
+        deviceList.setLayoutManager(new LinearLayoutManager(_context));
 
-        if (isAdded()) {
-            _deviceList.setLayoutManager(new LinearLayoutManager(getActivity()));
-            _deviceList.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-        }
+        fab.setOnClickListener(_fabOnClickListener);
+        fab.hide();
 
         _devices.add(device);
         _devices.add(device2);
         _devices.add(device3);
+        _devices.add(device4);
+        _devices.add(device5);
+        _devices.add(device6);
+        _devices.add(device7);
+        _devices.add(device8);
+        _devices.add(device9);
 
-        _adapter = new DeviceListAdapter(/*_bluetooth.getBondedDevices()*/_devices, _fab);
-        _deviceList.setAdapter(_adapter);
+        _adapter = new DeviceListAdapter(/*_bluetooth.getBondedDevices()*/_devices, fab);
+        deviceList.setAdapter(_adapter);
         ItemTouchHelper.Callback callback = new TouchHelperCallback(_adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(_deviceList);
+        itemTouchHelper.attachToRecyclerView(deviceList);
 
         searchEditText.addTextChangedListener(_queryTextListener);
 
@@ -98,7 +114,7 @@ public class DevicesFragment extends Fragment{
         @Override
         public void onFinish() {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.main_content, new GaugesFragment());
+            fragmentTransaction.add(R.id.main_content, new GaugesFragment_());
             fragmentTransaction.commit();
         }
     };
@@ -113,23 +129,23 @@ public class DevicesFragment extends Fragment{
             fragmentTransaction.commit();*/
         }
     };
-
-    private BluetoothStateListener _btStateListener = new BluetoothStateListener() {
-        @Override
-        public void setFoundDevices() {
-            _adapter.notifyDataSetChanged();
-        }
-
-        @Override
-        public void setDevice() {
-
-        }
-
-        @Override
-        public void setFAB(Intent intent) {
-            //_animation.setFAB(intent, _fab, getActivity());
-        }
-    };
+//
+//    private BluetoothStateListener _btStateListener = new BluetoothStateListener() {
+//        @Override
+//        public void setFoundDevices() {
+//            _adapter.notifyDataSetChanged();
+//        }
+//
+//        @Override
+//        public void setDevice() {
+//
+//        }
+//
+//        @Override
+//        public void setFAB(Intent intent) {
+//            //_animation.setFAB(intent, _fab, getActivity());
+//        }
+//    };
 
     private OnClickListener _searchListener = new OnClickListener() {
         @Override

@@ -1,45 +1,82 @@
 package fragments;
 
-import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.animation.*;
+import android.widget.*;
 
 import com.example.kestutis.cargauges.R;
 
-import java.util.Random;
+import org.androidannotations.annotations.*;
+
+import java.util.*;
 
 import views.GaugeView;
 
+@EFragment(R.layout.fragment_gauges)
 public class GaugesFragment extends Fragment {
-    private GaugeView _oilGaugeView;
-    private GaugeView _chargeGaugeView;
-    private GaugeView _waterTempGaugeView;
-    private GaugeView _oilTempGaugeView;
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View main = inflater.inflate(R.layout.fragment_gauges, container, false);
+    @ViewById(R.id.oil_pressure_gauge_view) GaugeView _oilPressureGaugeView;
+    @ViewById(R.id.oil_pressure_gauge_text) TextView _oilPressureGaugeText;
+    @ViewById(R.id.oil_pressure_chart) LinearLayout _oilPressureGaugeChart;
 
-        _oilGaugeView = main.findViewById(R.id.oil_gauge);
-        _chargeGaugeView = main.findViewById(R.id.charge_gauge);
-        _waterTempGaugeView = main.findViewById(R.id.water_temp_gauge);
-        _oilTempGaugeView = main.findViewById(R.id.oil_temp_gauge);
+
+    @ViewById(R.id.oil_temp_gauge_view) GaugeView _oilTempGaugeView;
+    @ViewById(R.id.oil_temp_gauge_text) TextView _oilTempGaugeText;
+    @ViewById(R.id.oil_temp_chart) LinearLayout _oilTempGaugeChart;
+
+    @AfterViews
+    void setUpViews(){
         mTimer.start();
-
-        return main;
     }
 
+    @Click({R.id.oil_pressure_expand_btn, R.id.oil_temp_expand_btn})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.oil_pressure_expand_btn:
+
+                if (_oilPressureGaugeChart.getVisibility() != View.GONE) {
+                    view.startAnimation(getRotateAnimation(45.0f, 0.0f));
+                    _oilPressureGaugeChart.setVisibility(View.GONE);
+                    break;
+                } else {
+                    view.startAnimation(getRotateAnimation(0.0f, 45.0f));
+                    _oilPressureGaugeChart.setVisibility(View.VISIBLE);
+                    break;
+                }
+            case R.id.oil_temp_expand_btn:
+
+                if (_oilTempGaugeChart.getVisibility() != View.GONE) {
+                    view.startAnimation(getRotateAnimation(45.0f, 0.0f));
+                    _oilTempGaugeChart.setVisibility(View.GONE);
+                    break;
+                } else {
+                    view.startAnimation(getRotateAnimation(0.0f, 45.0f));
+                    _oilTempGaugeChart.setVisibility(View.VISIBLE);
+                    break;
+                }
+        }
+    }
+
+    private RotateAnimation getRotateAnimation(float fromDegrees, float toDegrees){
+        RotateAnimation rotate = new RotateAnimation(fromDegrees, toDegrees, Animation.RELATIVE_TO_SELF,  0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotate.setDuration(150);
+        rotate.setFillAfter(true);
+
+        return rotate;
+    }
+
+
     private final CountDownTimer mTimer = new CountDownTimer(60000, 1500) {
+
         @Override
         public void onTick(final long millisUntilFinished) {
-            _oilGaugeView.setValue(new Random().nextInt(100)*2);
-            _chargeGaugeView.setValue(new Random().nextInt(100)*2);
-            _waterTempGaugeView.setValue(new Random().nextInt(100)*2);
+            _oilPressureGaugeView.setValue(new Random().nextInt(100)*2);
+            _oilPressureGaugeText.setText(String.format(Locale.US, "%5.1f", _oilPressureGaugeView.getValue()));
+
             _oilTempGaugeView.setValue(new Random().nextInt(100)*2);
+            _oilTempGaugeText.setText(String.format(Locale.US, "%5.1f", _oilTempGaugeView.getValue()));
         }
 
         @Override

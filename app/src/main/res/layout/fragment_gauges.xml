@@ -4,20 +4,21 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorBackground">
 
     <LinearLayout
+        android:id="@id/oil_pressure_gauge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingBottom="40dp">
+        android:orientation="vertical"
+        android:background="@drawable/gauge_background"
+        android:layout_margin="10dp">
 
         <views.GaugeView
-            android:id="@id/oil_gauge"
+            android:id="@id/oil_pressure_gauge_view"
             android:layout_width="360dp"
             android:layout_height="240dp"
-            android:layout_margin="10dp"
+            android:layout_gravity="center"
             app:divisions="10"
             app:gaugeRedSide="left"
             app:gaugeType="round"
@@ -28,20 +29,74 @@
             app:showText="false"
             app:subdivisions="4" />
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingEnd="5dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:text="@string/text_oil_pressure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="25sp"
+                android:layout_alignParentStart="true"
+                android:fontFamily="@assets/font/worksans_regular"/>
+
+            <TextView
+                android:id="@id/oil_pressure_gauge_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="25sp"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@assets/font/worksans_regular"/>
+
+            <TextView
+                android:text="@string/bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="25sp"
+                android:layout_toEndOf="@id/oil_pressure_gauge_text"
+                android:fontFamily="@assets/font/worksans_regular"/>
+
+            <ImageView
+                android:id="@id/oil_pressure_expand_btn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/plus"/>
+
+            <LinearLayout
+                android:id="@id/oil_pressure_chart"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@color/colorAccent"
+                android:layout_below="@id/oil_pressure_expand_btn"
+                android:visibility="gone"
+                android:orientation="horizontal"/>
+
+        </RelativeLayout>
+
     </LinearLayout>
 
     <LinearLayout
+        android:id="@id/oil_temp_gauge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingBottom="40dp">
+        android:orientation="vertical"
+        android:background="@drawable/gauge_background"
+        android:layout_margin="10dp">
 
         <views.GaugeView
-            android:id="@id/water_temp_gauge"
-            android:layout_width="180dp"
-            android:layout_height="120dp"
-            android:layout_margin="10dp"
+            android:id="@id/oil_temp_gauge_view"
+            android:layout_width="360dp"
+            android:layout_height="240dp"
+            android:layout_gravity="center"
             app:divisions="10"
             app:gaugeRedSide="left"
             app:gaugeType="round"
@@ -50,47 +105,60 @@
             app:scaleStartValue="0"
             app:showScaleValues="true"
             app:showText="false"
-            app:subdivisions="10" />
+            app:subdivisions="4" />
 
-        <views.GaugeView
-            android:id="@id/charge_gauge"
-            android:layout_width="180dp"
-            android:layout_height="120dp"
-            android:layout_margin="10dp"
-            app:divisions="10"
-            app:gaugeRedSide="left"
-            app:gaugeType="round"
-            app:redDivisions="7"
-            app:scaleEndValue="200"
-            app:scaleStartValue="0"
-            app:showScaleValues="true"
-            app:showText="false"
-            app:subdivisions="10" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingEnd="5dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="5dp">
 
+            <TextView
+                android:text="@string/text_oil_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="25sp"
+                android:layout_alignParentStart="true"
+                android:fontFamily="@assets/font/worksans_regular"/>
 
-    </LinearLayout>
+            <TextView
+                android:id="@id/oil_temp_gauge_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="25sp"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@assets/font/worksans_regular"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingBottom="40dp">
+            <TextView
+                android:text="@string/bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="25sp"
+                android:layout_toEndOf="@id/oil_temp_gauge_text"
+                android:fontFamily="@assets/font/worksans_regular"/>
 
-        <views.GaugeView
-            android:id="@id/oil_temp_gauge"
-            android:layout_width="180dp"
-            android:layout_height="120dp"
-            android:layout_margin="10dp"
-            app:divisions="10"
-            app:gaugeRedSide="left"
-            app:gaugeType="round"
-            app:redDivisions="7"
-            app:scaleEndValue="200"
-            app:scaleStartValue="0"
-            app:showScaleValues="true"
-            app:showText="false"
-            app:subdivisions="10" />
+            <ImageView
+                android:id="@id/oil_temp_expand_btn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/plus"/>
+
+            <LinearLayout
+                android:id="@id/oil_temp_chart"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@color/colorAccent"
+                android:layout_below="@id/oil_temp_expand_btn"
+                android:visibility="gone"
+                android:orientation="horizontal"/>
+
+        </RelativeLayout>
 
     </LinearLayout>
 

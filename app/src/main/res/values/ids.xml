@@ -11,14 +11,36 @@
     <item type="id" name="text_status" />
     <item type="id" name="text_address" />
     <item type="id" name="image_view" />
-    <item type="id" name="oil_gauge"/>
+
+    <item type="id" name="gauge"/>
+    <item type="id" name="gauge_view"/>
+
+    <item type="id" name="view_text"/>
+
+
+
+    <item type="id" name="oil_pressure_gauge"/>
+    <item type="id" name="oil_pressure_gauge_text"/>
+    <item type="id" name="oil_pressure_gauge_view"/>
+    <item type="id" name="oil_pressure_chart"/>
+    <item type="id" name="oil_pressure_expand_btn" />
+
+    <item type="id" name="oil_temp_gauge"/>
+    <item type="id" name="oil_temp_gauge_text"/>
+    <item type="id" name="oil_temp_gauge_view"/>
+    <item type="id" name="oil_temp_chart"/>
+    <item type="id" name="oil_temp_expand_btn" />
+
     <item type="id" name="water_temp_gauge"/>
     <item type="id" name="charge_gauge"/>
-    <item type="id" name="oil_temp_gauge"/>
     <item type="id" name="search"/>
     <item type="id" name="search_button"/>
     <item type="id" name="relative_layout"/>
     <item type="id" name="progress_bar"/>
+
     <item type="id" name="action_settings"/>
+    <item type="id" name="action_account_settings"/>
+
+    <item type="id" name="settings_container"/>
 
 </resources>

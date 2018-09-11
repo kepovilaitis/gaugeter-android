@@ -4,9 +4,13 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.*;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import fragments.DevicesFragment;
+import fragments.SettingsFragment;
+
+
 import com.example.kestutis.cargauges.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,9 +35,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
+
+        switch (item.getItemId()) {
             case R.id.action_settings:
+                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.main_content, new SettingsFragment());
+                fragmentTransaction.commit();
                 // do stuff, like showing settings fragment
                 return true;
         }
