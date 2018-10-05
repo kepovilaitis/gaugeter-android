@@ -1,8 +1,13 @@
 package fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.LayoutTransition;
+import android.animation.ValueAnimator;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.*;
 import android.widget.*;
 
@@ -12,16 +17,18 @@ import org.androidannotations.annotations.*;
 
 import java.util.*;
 
+import animation.SlideAnimation;
 import views.GaugeView;
 
 @EFragment(R.layout.fragment_gauges)
 public class GaugesFragment extends Fragment {
 
+    @ViewById(R.id.oil_pressure_gauge) ViewGroup _oilPressureGauge;
     @ViewById(R.id.oil_pressure_gauge_view) GaugeView _oilPressureGaugeView;
     @ViewById(R.id.oil_pressure_gauge_text) TextView _oilPressureGaugeText;
     @ViewById(R.id.oil_pressure_chart) LinearLayout _oilPressureGaugeChart;
 
-
+    @ViewById(R.id.oil_temp_gauge) ViewGroup _oilTempGauge;
     @ViewById(R.id.oil_temp_gauge_view) GaugeView _oilTempGaugeView;
     @ViewById(R.id.oil_temp_gauge_text) TextView _oilTempGaugeText;
     @ViewById(R.id.oil_temp_chart) LinearLayout _oilTempGaugeChart;
@@ -29,6 +36,12 @@ public class GaugesFragment extends Fragment {
     @AfterViews
     void setUpViews(){
         mTimer.start();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mTimer.cancel();
     }
 
     @Click({R.id.oil_pressure_expand_btn, R.id.oil_temp_expand_btn})
@@ -61,7 +74,7 @@ public class GaugesFragment extends Fragment {
 
     private RotateAnimation getRotateAnimation(float fromDegrees, float toDegrees){
         RotateAnimation rotate = new RotateAnimation(fromDegrees, toDegrees, Animation.RELATIVE_TO_SELF,  0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        rotate.setDuration(150);
+        rotate.setDuration(100);
         rotate.setFillAfter(true);
 
         return rotate;

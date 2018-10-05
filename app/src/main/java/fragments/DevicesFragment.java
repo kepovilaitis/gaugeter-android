@@ -42,7 +42,7 @@ public class DevicesFragment extends Fragment{
     private DeviceListAdapter _adapter;
     private Context _context;
 
-    DeviceInfoHolder device = new DeviceInfoHolder("Pradzia", "00:11:22:33:44", BluetoothDevice.BOND_BONDING);
+    DeviceInfoHolder device = new DeviceInfoHolder("BMW 323i", "25:65:65:66:77", BluetoothDevice.BOND_BONDED);
     DeviceInfoHolder device2 = new DeviceInfoHolder("BMW 320i", "25:65:65:44:77", BluetoothDevice.BOND_BONDING);
     DeviceInfoHolder device3 = new DeviceInfoHolder("BMW 328i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
     DeviceInfoHolder device4 = new DeviceInfoHolder("BMW 318i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
@@ -59,14 +59,14 @@ public class DevicesFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-        _bluetooth = BluetoothController.getInstance();
+//        _bluetooth = BluetoothController.getInstance();
         //_bluetooth.setBtStateListener(_btStateListener);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View main = inflater.inflate(R.layout.fragment_devices, container, false);
-        RecyclerView deviceList = main.findViewById(R.id.paired_device_list_view);
+        RecyclerView _deviceList = main.findViewById(R.id.paired_device_list_view);
         Button searchButton = main.findViewById(R.id.search_button);
         EditText searchEditText = main.findViewById(R.id.search);
         FloatingActionButton fab = main.findViewById(R.id.fab);
@@ -79,7 +79,7 @@ public class DevicesFragment extends Fragment{
 
         searchButton.setOnClickListener(_searchListener);
 
-        deviceList.setLayoutManager(new LinearLayoutManager(_context));
+        _deviceList.setLayoutManager(new LinearLayoutManager(_context));
 
         fab.setOnClickListener(_fabOnClickListener);
         fab.hide();
@@ -95,10 +95,10 @@ public class DevicesFragment extends Fragment{
         _devices.add(device9);
 
         _adapter = new DeviceListAdapter(/*_bluetooth.getBondedDevices()*/_devices, fab);
-        deviceList.setAdapter(_adapter);
+        _deviceList.setAdapter(_adapter);
         ItemTouchHelper.Callback callback = new TouchHelperCallback(_adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(deviceList);
+        itemTouchHelper.attachToRecyclerView(_deviceList);
 
         searchEditText.addTextChangedListener(_queryTextListener);
 
@@ -115,7 +115,11 @@ public class DevicesFragment extends Fragment{
         public void onFinish() {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.main_content, new GaugesFragment_());
+            fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
+            _adapter._isClickable = true;
+            _adapter.stopProgressBar();
+
         }
     };
 
@@ -123,29 +127,13 @@ public class DevicesFragment extends Fragment{
         @Override
         public void onClick(View v) {
             _adapter.startProgressBar();
+            _adapter._isClickable = false;
             mTimer.start();
             /*FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.main_content, new GaugesFragment());
             fragmentTransaction.commit();*/
         }
     };
-//
-//    private BluetoothStateListener _btStateListener = new BluetoothStateListener() {
-//        @Override
-//        public void setFoundDevices() {
-//            _adapter.notifyDataSetChanged();
-//        }
-//
-//        @Override
-//        public void setDevice() {
-//
-//        }
-//
-//        @Override
-//        public void setFAB(Intent intent) {
-//            //_animation.setFAB(intent, _fab, getActivity());
-//        }
-//    };
 
     private OnClickListener _searchListener = new OnClickListener() {
         @Override

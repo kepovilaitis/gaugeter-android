@@ -1,6 +1,5 @@
 package adapters;
 
-import android.graphics.drawable.*;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,8 +7,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.*;
-import android.widget.*;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.kestutis.cargauges.R;
 
@@ -31,12 +32,13 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
     private BluetoothController _bluetoothController;
     private View _view;
     private ProgressBar _progressBar;
+    public boolean _isClickable = true;
 
     public DeviceListAdapter(List<DeviceInfoHolder> devices, FloatingActionButton fab){
         _devices = devices;
         filteredDevices = devices;
         _fab = fab;
-        _bluetoothController = BluetoothController.getInstance();
+//        _bluetoothController = BluetoothController.getInstance();
     }
 
     @NonNull
@@ -117,6 +119,10 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
         _progressBar.setVisibility(View.VISIBLE);
     }
 
+    public void stopProgressBar(){
+        _progressBar.setVisibility(View.INVISIBLE);
+    }
+
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
         Collections.swap(_devices, fromPosition, toPosition);
@@ -179,6 +185,10 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if (!_isClickable){
+                        return;
+                    }
+
                     int position = getLayoutPosition();
 
                     notifyItemChanged(_selectedPos);

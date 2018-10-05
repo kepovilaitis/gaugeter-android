@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.main_content, new DevicesFragment());
-        fragmentTransaction.addToBackStack("Device Fragment");
         fragmentTransaction.commit();
     }
 
@@ -38,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.action_settings:
-                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.main_content, new SettingsFragment());
-                fragmentTransaction.commit();
+                //FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                //fragmentTransaction.replace(R.id.main_content, new SettingsFragment());
+                //fragmentTransaction.commit();
                 // do stuff, like showing settings fragment
                 return true;
         }

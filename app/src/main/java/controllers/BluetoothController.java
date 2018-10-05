@@ -26,6 +26,13 @@ public class BluetoothController {
     private Set<BluetoothDevice> _bondedDevices;
     @Setter private BluetoothStateListener _btStateListener;
 
+    private static BluetoothController INSTANCE = null;
+
+    // other instance variables can be here
+
+//    public static BluetoothController getInstance() {
+//        return(INSTANCE);
+//    }
 
     public static void setInstance(Context base) {
         _instance = new BluetoothController(base);
