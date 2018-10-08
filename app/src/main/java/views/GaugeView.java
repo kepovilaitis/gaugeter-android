@@ -3,9 +3,7 @@ package views;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.*;
-import android.graphics.Paint.Align;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.example.kestutis.cargauges.R;
@@ -249,7 +247,7 @@ public class GaugeView extends View {
             paint.setStrokeWidth(0.005f);
             paint.setTextSize(0.05f);
             paint.setTypeface(Typeface.createFromAsset(_context.getAssets(),"font/worksans_regular.ttf"));
-            paint.setTextAlign(Align.CENTER);
+            paint.setTextAlign(Paint.Align.CENTER);
             paint.setShadowLayer(0.005f, 0.002f, 0.002f, 0);
 
             if (isDivisionTick) {
