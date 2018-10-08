@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:animateLayoutChanges="true"
+    android:background="@drawable/gauge_background"
+    android:layout_margin="10dp"
+    android:paddingBottom="5dp">
+
+    <views.GaugeView
+        android:id="@id/gauge_view"
+        android:layout_width="360dp"
+        android:layout_height="240dp"
+        android:layout_gravity="center"
+        app:divisions="10"
+        app:gaugeRedSide="left"
+        app:gaugeType="round"
+        app:redDivisions="7"
+        app:scaleEndValue="200"
+        app:scaleStartValue="0"
+        app:showScaleValues="true"
+        app:showText="false"
+        app:subdivisions="4" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingEnd="5dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="5dp">
+
+        <TextView
+            android:id="@id/gauge_text"
+            android:text="@string/text_oil_pressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="25sp"
+            android:layout_alignParentStart="true"
+            android:fontFamily="@assets/font/worksans_regular"/>
+
+        <TextView
+            android:id="@id/value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="25sp"
+            android:layout_toEndOf="@id/gauge_text"
+            android:fontFamily="@assets/font/worksans_regular"/>
+
+        <TextView
+            android:id="@id/units"
+            android:text="@string/bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="25sp"
+            android:layout_toEndOf="@id/value"
+            android:fontFamily="@assets/font/worksans_regular"/>
+
+        <ImageView
+            android:id="@id/expand_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/plus"/>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@id/expand_btn"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

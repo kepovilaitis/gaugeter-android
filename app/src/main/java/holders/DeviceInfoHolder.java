@@ -3,8 +3,7 @@ package holders;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
+@Getter @AllArgsConstructor
 public class DeviceInfoHolder {
 
     private String _name;

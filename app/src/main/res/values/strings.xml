@@ -8,8 +8,11 @@
 
     <string name="text_oil_pressure">"Oil pressure: "</string>
     <string name="text_oil_temp">"Oil temperature: "</string>
+    <string name="text_water_temp">"Water temperature: "</string>
+    <string name="text_charge">"Charge: "</string>
 
-
+    <string name="degrees_celcius">"°C"</string>
+    <string name="volts">"V"</string>
     <string name="bar">"bar"</string>
 
     <string name="pref_version">Version</string>

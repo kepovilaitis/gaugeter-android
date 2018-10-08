@@ -2,16 +2,17 @@ package fragments;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothAdapter;
-import android.content.*;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
-import android.support.design.widget.*;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextWatcher;
 import android.text.Editable;
@@ -22,15 +23,12 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Button;
 
-
 import controllers.BluetoothController;
 import helper.TouchHelperCallback;
 import holders.DeviceInfoHolder;
 import constants.Constants;
-import interfaces.BluetoothStateListener;
 
 import adapters.DeviceListAdapter;
-import lombok.*;
 
 import com.example.kestutis.cargauges.R;
 
@@ -76,12 +74,8 @@ public class DevicesFragment extends Fragment{
         }
 
         setHasOptionsMenu(true);
-
         searchButton.setOnClickListener(_searchListener);
-
         _deviceList.setLayoutManager(new LinearLayoutManager(_context));
-
-        fab.setOnClickListener(_fabOnClickListener);
         fab.hide();
 
         _devices.add(device);
@@ -93,6 +87,7 @@ public class DevicesFragment extends Fragment{
         _devices.add(device7);
         _devices.add(device8);
         _devices.add(device9);
+        mTimer.start();
 
         _adapter = new DeviceListAdapter(/*_bluetooth.getBondedDevices()*/_devices, fab);
         _deviceList.setAdapter(_adapter);
@@ -105,7 +100,7 @@ public class DevicesFragment extends Fragment{
         return main;
     }
 
-    private final CountDownTimer mTimer = new CountDownTimer(5000, 1500) {
+    private final CountDownTimer mTimer = new CountDownTimer(15000, 1500) {
         @Override
         public void onTick(final long millisUntilFinished) {
 
@@ -117,21 +112,6 @@ public class DevicesFragment extends Fragment{
             fragmentTransaction.add(R.id.main_content, new GaugesFragment_());
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
-            _adapter._isClickable = true;
-            _adapter.stopProgressBar();
-
-        }
-    };
-
-    private OnClickListener _fabOnClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            _adapter.startProgressBar();
-            _adapter._isClickable = false;
-            mTimer.start();
-            /*FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.main_content, new GaugesFragment());
-            fragmentTransaction.commit();*/
         }
     };
 
