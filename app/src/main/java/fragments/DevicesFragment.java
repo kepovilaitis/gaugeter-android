@@ -100,6 +100,13 @@ public class DevicesFragment extends Fragment{
         return main;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        mTimer.cancel();
+    }
+
     private final CountDownTimer mTimer = new CountDownTimer(15000, 1500) {
         @Override
         public void onTick(final long millisUntilFinished) {
@@ -109,7 +116,7 @@ public class DevicesFragment extends Fragment{
         @Override
         public void onFinish() {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.main_content, new GaugesFragment_());
+            fragmentTransaction.add(R.id.main_content, new LiveDataFragment_());
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         }

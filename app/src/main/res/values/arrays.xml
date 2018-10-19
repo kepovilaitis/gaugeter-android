@@ -13,5 +13,25 @@
         <item>ru_RU</item>
     </string-array>
 
+    <string-array name="measurement_system_values">
+        <item>Metric</item>
+        <item>Imperial</item>
+    </string-array>
+
+    <string-array name="gauges_values">
+        <item>Oil pressure</item>
+        <item>Oil temperature</item>
+        <item>Water temperature</item>
+        <item>Charge</item>
+        <item>Tire pressure</item>
+        <item>Acceleration</item>
+    </string-array>
+
+    <string-array name="gauges_default_values">
+        <item>Oil pressure</item>
+        <item>Oil temperature</item>
+        <item>Water temperature</item>
+        <item>Charge</item>
+    </string-array>
 
 </resources>

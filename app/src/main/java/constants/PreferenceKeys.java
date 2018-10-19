@@ -1,6 +1,6 @@
 package constants;
 
-public class Preferences {
+public class PreferenceKeys {
 
     public final static String PREF_MAP_TYPE = "mapTypePref";
 
@@ -9,7 +9,7 @@ public class Preferences {
     public final static String PREFERENCE_ALERT_SOUND_TITLE = "alertSoundTitle";
     public final static String PREFERENCE_VIBRATION = "vibrationPref";
     public final static String PREFERENCE_MAP_TYPE = "mapTypePref";
-    public final static String PREFERENCE_LANGUAGE = "language";
+    public final static String PREFERENCE_LANGUAGE = "languagePref";
     public final static String PREFERENCE_EVENT_HISTORY = "eventHistoryPref";
     public final static String PREFERENCE_UNLOCK = "unlockPref";
     public final static String PREFERENCE_UNLOCK_ALERT_ENABLED = "unlockAlertEnabledPref";
@@ -24,6 +24,8 @@ public class Preferences {
     public final static String PREFERENCE_MORE = "morePref";
     public final static String PREFERENCE_TEMPERATURE = "temperaturePref";
     public final static String PREFERENCE_VERSION = "versionPref";
+    public final static String PREFERENCE_MEASUREMENT_SYSTEM = "measurementSystemPref";
+    public final static String PREFERENCE_GAUGES = "gaugesPref";
 
     public final static String VALUE_ALERT_DEFAULT = "";
 }

@@ -1,5 +1,7 @@
 package activities;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -8,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import fragments.DevicesFragment;
-import fragments.SettingsFragment;
 
 
 import com.example.kestutis.cargauges.R;
@@ -37,10 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.action_settings:
-                //FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                //fragmentTransaction.replace(R.id.main_content, new SettingsFragment());
-                //fragmentTransaction.commit();
-                // do stuff, like showing settings fragment
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
         }
 
