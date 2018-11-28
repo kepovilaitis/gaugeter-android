@@ -2,37 +2,39 @@ package controllers;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
-import interfaces.BluetoothStateListener;
-
+import java.io.*;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 
+import holders.RealTimeDataHolder;
+import interfaces.InputDataUpdateListener;
+import interfaces.SocketConnectedListener;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+//https://stackoverflow.com/questions/35647767/android-bluetooth-wake-up-device
+
+import static android.content.ContentValues.TAG;
 
 @NoArgsConstructor
 public class BluetoothController {
     @Getter private static BluetoothController _instance;
     private BluetoothAdapter _adapter;
+    @Setter private InputDataUpdateListener _dataUpdateListener = null;
     private Set<BluetoothDevice> _foundDevices;
     private Set<BluetoothDevice> _bondedDevices;
-    @Setter private BluetoothStateListener _btStateListener;
-
-    private static BluetoothController INSTANCE = null;
-
-    // other instance variables can be here
-
-//    public static BluetoothController getInstance() {
-//        return(INSTANCE);
-//    }
+    private ReadParamsThread _readThread;
 
     public static void setInstance(Context base) {
         _instance = new BluetoothController(base);
@@ -41,7 +43,7 @@ public class BluetoothController {
     private BluetoothController(Context base) {
         _adapter = BluetoothAdapter.getDefaultAdapter();
         base.registerReceiver(_btReceiver, getFilter());
-        //_bondedDevices = _adapter.getBondedDevices();
+        _bondedDevices = _adapter.getBondedDevices();
     }
 
     public List<BluetoothDevice> getFoundDevices() {
@@ -53,13 +55,9 @@ public class BluetoothController {
     }
 
     public boolean isBluetoothOn() {
-        //return _adapter.isEnabled();
-        return true;
+        return _adapter.isEnabled();
     }
 
-    public boolean isDeviceConnected(String address) {
-        return BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address) != null;
-    }
 
     public void startDiscovery(){
         _foundDevices.clear();
@@ -80,54 +78,18 @@ public class BluetoothController {
         }
     }
 
+    public void connectToDevice(BluetoothDevice device, SocketConnectedListener listener){
+        _readThread = new ReadParamsThread(device, listener);
+        _readThread.start();
+    }
+
     public void delete(BluetoothDevice device){
 
     }
 
-    /*private void setState(int state) {
-        switch (state) {
-            case BluetoothAdapter.STATE_OFF:
-                Log.d("STATE","BLA Off");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_off_white_48dp, R.anim.stay_still);
-                break;
-            case BluetoothAdapter.STATE_TURNING_OFF:
-                Log.d("STATE","BLA Turning off");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_off_white_48dp, R.anim.rotate);
-                break;
-            case BluetoothAdapter.STATE_ON:
-                Log.d("STATE","BLA On");
-
-                _btStateListener.setFAB(R.drawable.ic_radar, R.anim.stay_still);
-                break;
-            case BluetoothAdapter.STATE_TURNING_ON:
-                Log.d("STATE","BLA Turning on");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_white_48dp, R.anim.rotate);
-                break;
-            case BluetoothAdapter.STATE_CONNECTING:
-                Log.d("STATE","BLA Connecting");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_connect_white_48dp, R.anim.rotate);
-                break;
-            case BluetoothAdapter.STATE_CONNECTED:
-                Log.d("STATE","BLA Connected");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_connect_white_48dp, R.anim.stay_still);
-                break;
-            case BluetoothAdapter.STATE_DISCONNECTING:
-                Log.d("STATE","BLA Disconnecting");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_white_48dp, R.anim.rotate);
-                break;
-            case BluetoothAdapter.STATE_DISCONNECTED:
-                Log.d("STATE","BLA Disconnected");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_off_white_48dp, R.anim.stay_still);
-                break;
-        }
-    }*/
+    public void closeSocket(){
+        _readThread.closeConnection();
+    }
 
     private IntentFilter getFilter(){
         IntentFilter filter = new IntentFilter();
@@ -144,7 +106,6 @@ public class BluetoothController {
             String action = intent.getAction();
 
             if (action != null) {
-                _btStateListener.setFAB(intent);
                 switch (action) {
                     case BluetoothAdapter.ACTION_STATE_CHANGED:
                         Log.d("ACTION","BLA State changed");
@@ -162,7 +123,6 @@ public class BluetoothController {
                         Log.d("ACTION","BLA Discovery started");
                         break;
                     case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
-                        _btStateListener.setFoundDevices();
                         //_btStateListener.setFAB(R.drawable.ic_bluetooth_white_48dp, R.anim.stay_still);
                         Log.d("ACTION"," BLA Discovery finished");
                         break;
@@ -170,4 +130,104 @@ public class BluetoothController {
             }
         }
     };
+
+    private class ReadParamsThread extends Thread {
+        private final BluetoothSocket _socket;
+        private SocketConnectedListener _listener;
+        private final Handler _handler;
+
+        ReadParamsThread(BluetoothDevice device, SocketConnectedListener listener) {
+            _listener = listener;
+            BluetoothSocket temporarySocket = null;
+
+            try {
+                temporarySocket = device.createRfcommSocketToServiceRecord(device.getUuids()[0].getUuid());
+            } catch (IOException e) {
+                Log.e(TAG, "Socket's createRfcommSocketToServiceRecord() method failed", e);
+            }
+            _socket = temporarySocket;
+
+            _handler = new Handler(Looper.getMainLooper());
+        }
+
+        public void run() {
+            _adapter.cancelDiscovery();
+
+            try {
+                // Connect to the remote device through the socket. This call blocks until it succeeds or throws an exception.
+                _socket.connect();
+                _socket.getOutputStream().write(0);
+                _listener.hasConnected();
+
+            } catch (IOException connectException) {
+
+                try {
+                    _socket.close();
+
+                    _handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            _listener.connectionAttemptHasFailed();
+                        }
+                    });
+
+                } catch (IOException closeException) {
+                    Log.e(TAG, "Could not close the client socket", closeException);
+                }
+                return;
+            }
+
+            while (_socket.isConnected()){
+                try {
+
+                    BufferedReader r = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
+
+                    for (String line; (line = r.readLine()) != null; ) {
+                        String[] numbers = line.split(";");
+
+                        if (numbers.length == 4) {
+                            final RealTimeDataHolder data = new RealTimeDataHolder(
+                                    Integer.parseInt(numbers[0]),
+                                    Integer.parseInt(numbers[1]),
+                                    Integer.parseInt(numbers[2]),
+                                    Integer.parseInt(numbers[3])
+                            );
+
+                            _handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (_dataUpdateListener != null) {
+                                        _dataUpdateListener.update(data);
+                                    }
+                                }
+                            });
+                        }
+                        Log.d("reading ", "values");
+                    }
+                } catch (IOException e) {
+                    Log.d("entered  ", "exception");
+
+                    _handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (_dataUpdateListener != null) {
+                                Log.d("connectionWasLost  ", "within handler");
+                                _dataUpdateListener.connectionWasLost();
+                            }
+                        }
+                    });
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        }
+
+        void closeConnection() {
+            try {
+                _socket.close();
+                Log.d("isConnected", String.valueOf(_socket.isConnected()));
+            } catch (IOException e) {
+                Log.e(TAG, "Could not close the connect socket", e);
+            }
+        }
+    }
 }

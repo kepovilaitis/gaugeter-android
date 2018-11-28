@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -24,11 +23,12 @@ import android.widget.EditText;
 import android.widget.Button;
 
 import controllers.BluetoothController;
-import helper.TouchHelperCallback;
-import holders.DeviceInfoHolder;
+import helpers.TouchHelperCallback;
 import constants.Constants;
 
 import adapters.DeviceListAdapter;
+import interfaces.BluetoothItemSelectListener;
+import interfaces.SocketConnectedListener;
 
 import com.example.kestutis.cargauges.R;
 
@@ -40,25 +40,14 @@ public class DevicesFragment extends Fragment{
     private DeviceListAdapter _adapter;
     private Context _context;
 
-    DeviceInfoHolder device = new DeviceInfoHolder("BMW 323i", "25:65:65:66:77", BluetoothDevice.BOND_BONDED);
-    DeviceInfoHolder device2 = new DeviceInfoHolder("BMW 320i", "25:65:65:44:77", BluetoothDevice.BOND_BONDING);
-    DeviceInfoHolder device3 = new DeviceInfoHolder("BMW 328i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
-    DeviceInfoHolder device4 = new DeviceInfoHolder("BMW 318i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
-    DeviceInfoHolder device5 = new DeviceInfoHolder("BMW 323i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
-    DeviceInfoHolder device6 = new DeviceInfoHolder("VW Sharan", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
-    DeviceInfoHolder device7 = new DeviceInfoHolder("BMW 328i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
-    DeviceInfoHolder device8 = new DeviceInfoHolder("BMW 328i", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
-    DeviceInfoHolder device9 = new DeviceInfoHolder("Galas", "00:01:87:34:31", BluetoothDevice.BOND_BONDING);
-
-
-    private List<DeviceInfoHolder> _devices = new ArrayList<>();
+    private List<BluetoothDevice> _devices = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-//        _bluetooth = BluetoothController.getInstance();
-        //_bluetooth.setBtStateListener(_btStateListener);
+        _bluetooth = BluetoothController.getInstance();
+        _devices = _bluetooth.getBondedDevices();
     }
 
     @Override
@@ -78,18 +67,7 @@ public class DevicesFragment extends Fragment{
         _deviceList.setLayoutManager(new LinearLayoutManager(_context));
         fab.hide();
 
-        _devices.add(device);
-        _devices.add(device2);
-        _devices.add(device3);
-        _devices.add(device4);
-        _devices.add(device5);
-        _devices.add(device6);
-        _devices.add(device7);
-        _devices.add(device8);
-        _devices.add(device9);
-        mTimer.start();
-
-        _adapter = new DeviceListAdapter(/*_bluetooth.getBondedDevices()*/_devices, fab);
+        _adapter = new DeviceListAdapter(_devices, fab, _bluetoothItemClickListener);
         _deviceList.setAdapter(_adapter);
         ItemTouchHelper.Callback callback = new TouchHelperCallback(_adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
@@ -101,26 +79,15 @@ public class DevicesFragment extends Fragment{
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause(){
+        super.onPause();
 
-        mTimer.cancel();
+        resetListItems();
     }
 
-    private final CountDownTimer mTimer = new CountDownTimer(15000, 1500) {
-        @Override
-        public void onTick(final long millisUntilFinished) {
-
-        }
-
-        @Override
-        public void onFinish() {
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.main_content, new LiveDataFragment_());
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
-        }
-    };
+    private void resetListItems(){
+        _adapter.resetListItems();
+    }
 
     private OnClickListener _searchListener = new OnClickListener() {
         @Override
@@ -151,6 +118,31 @@ public class DevicesFragment extends Fragment{
         @Override
         public void afterTextChanged(Editable s) {
 
+        }
+    };
+
+    private BluetoothItemSelectListener _bluetoothItemClickListener = new BluetoothItemSelectListener() {
+        @Override
+        public void onClick(BluetoothDevice device) {
+            BluetoothController.getInstance().connectToDevice(device, _socketListener);
+        }
+    };
+
+    private SocketConnectedListener _socketListener = new SocketConnectedListener() {
+        @Override
+        public void hasConnected() {
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.main_content, new LiveDataFragment_());
+            fragmentTransaction.addToBackStack(DevicesFragment.class.getName());
+            fragmentTransaction.commit();
+        }
+
+        @Override
+        public void connectionAttemptHasFailed() {
+            if(isVisible()){
+                resetListItems();
+                Snackbar.make(getView(), "Could not connect to device", Snackbar.LENGTH_LONG).show();
+            }
         }
     };
 }

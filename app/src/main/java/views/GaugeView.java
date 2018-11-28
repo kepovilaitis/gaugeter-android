@@ -41,8 +41,6 @@ public class GaugeView extends View {
     private float _needleCenterCoordinatesX;
     private float _needleCenterCoordinatesY;
 
-    private boolean _showScaleValues;
-
     private double _newValue = 0.0;
     private double _oldValue = 0.0;
 
@@ -68,9 +66,9 @@ public class GaugeView extends View {
 
     private void readAttrs(final Context context, final AttributeSet attrs, final int defStyle) {
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.GaugeView, defStyle, 0);
-        _showScaleValues = a.getBoolean(R.styleable.GaugeView_showScaleValues, Constants.SHOW_SCALE);
+        boolean showScaleValues = a.getBoolean(R.styleable.GaugeView_showScaleValues, Constants.SHOW_SCALE);
 
-        _scalePosition = _showScaleValues ? a.getFloat(R.styleable.GaugeView_scalePosition, Constants.SCALE_POSITION) : 0.0f;
+        _scalePosition = showScaleValues ? a.getFloat(R.styleable.GaugeView_scalePosition, Constants.SCALE_POSITION) : 0.0f;
         _scaleStartValue = a.getFloat(R.styleable.GaugeView_scaleStartValue, Constants.SCALE_START_VALUE);
         _scaleEndValue = a.getFloat(R.styleable.GaugeView_scaleEndValue, Constants.SCALE_END_VALUE);
 

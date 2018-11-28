@@ -1,18 +1,19 @@
 package fragments;
 
-import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 
+import android.support.v4.app.FragmentTransaction;
 import com.example.kestutis.cargauges.R;
 
+import holders.RealTimeDataHolder;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.Random;
-
 import constants.PreferenceKeys;
+import controllers.BluetoothController;
 import controllers.PreferenceController;
+import interfaces.InputDataUpdateListener;
 import views.GaugeCardView;
 
 @EFragment(R.layout.fragment_gauges)
@@ -36,9 +37,9 @@ public class LiveDataFragment extends Fragment {
         _waterTempGaugeCard.setText(R.string.text_water_temp);
         _chargeGaugeCard.setText(R.string.text_charge);
 
-        _chargeGaugeCard.setUnits(R.string.volts);
+        BluetoothController.getInstance().setDataUpdateListener(_inputDataListener);
 
-        mTimer.start();
+        _chargeGaugeCard.setUnits(R.string.volts);
     }
 
     @Override
@@ -62,25 +63,28 @@ public class LiveDataFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mTimer.cancel();
+    public void onStop() {
+        super.onStop();
+
+            BluetoothController.getInstance().closeSocket();
     }
 
-    private final CountDownTimer mTimer = new CountDownTimer(60000, 1500) {
-
+    private InputDataUpdateListener _inputDataListener = new InputDataUpdateListener() {
         @Override
-        public void onTick(final long millisUntilFinished) {
-            double value1 = new Random().nextInt(100)*2;
-            double value2 = new Random().nextInt(100)*2;
-
-            _oilPressureGaugeCard.setValue(value1);
-            _oilTempGaugeCard.setValue(value2);
-            _waterTempGaugeCard.setValue(value1);
-            _chargeGaugeCard.setValue(value2);
+        public void update(RealTimeDataHolder data) {
+            if(isVisible()) {
+                _oilPressureGaugeCard.setValue(data.getOilPressure());
+                _oilTempGaugeCard.setValue(data.getOilTemperature());
+                _waterTempGaugeCard.setValue(data.getWaterTemperature());
+                _chargeGaugeCard.setValue(data.getCharge());
+            }
         }
 
         @Override
-        public void onFinish() {}
+        public void connectionWasLost() {
+            if (getFragmentManager() != null) {
+                getFragmentManager().popBackStack();
+            }
+        }
     };
 }
