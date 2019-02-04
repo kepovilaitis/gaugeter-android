@@ -154,7 +154,7 @@ if $cygwin ; then
     esac
 fi
 
-# Escape application args
+# Escape asdasda args
 save () {
     for i do printf %s\\n "$i" | sed "s/'/'\\\\''/g;1s/^/'/;\$s/\$/' \\\\/" ; done
     echo " "

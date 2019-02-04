@@ -20,9 +20,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,7 +32,7 @@ public class GaugeCardView extends LinearLayout {
     @ViewById(R.id.units) TextView _units;
     @ViewById(R.id.chart) LineChart _gaugeChart;
 
-    LineData _lineData;
+    private LineData _lineData;
 
     public GaugeCardView(Context context) {
         super(context);
@@ -85,9 +83,8 @@ public class GaugeCardView extends LinearLayout {
         _gaugeView.setValue(value);
         _value.setText(String.format(Locale.US, "%5.1f", value));
 
-        int seconds = (int) ((System.currentTimeMillis() / 1000) % 60);
-
-        _lineData.addEntry(new Entry(seconds, (float) value), 0);
+        int _seconds = 0;
+        _lineData.addEntry(new Entry(_seconds, (float) value), 0);
         _gaugeChart.notifyDataSetChanged();
         _gaugeChart.invalidate();
     }

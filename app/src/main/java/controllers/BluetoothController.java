@@ -2,37 +2,37 @@ package controllers;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import interfaces.BluetoothStateListener;
-
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 
+import interfaces.InputDataUpdateListener;
+import interfaces.SocketConnectedListener;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+//https://stackoverflow.com/questions/35647767/android-bluetooth-wake-up-device
+
+import static android.content.ContentValues.TAG;
 
 @NoArgsConstructor
 public class BluetoothController {
     @Getter private static BluetoothController _instance;
     private BluetoothAdapter _adapter;
+    @Setter private InputDataUpdateListener _dataUpdateListener = null;
     private Set<BluetoothDevice> _foundDevices;
     private Set<BluetoothDevice> _bondedDevices;
-    @Setter private BluetoothStateListener _btStateListener;
-
-    private static BluetoothController INSTANCE = null;
-
-    // other instance variables can be here
-
-//    public static BluetoothController getInstance() {
-//        return(INSTANCE);
-//    }
 
     public static void setInstance(Context base) {
         _instance = new BluetoothController(base);
@@ -41,7 +41,7 @@ public class BluetoothController {
     private BluetoothController(Context base) {
         _adapter = BluetoothAdapter.getDefaultAdapter();
         base.registerReceiver(_btReceiver, getFilter());
-        //_bondedDevices = _adapter.getBondedDevices();
+        _bondedDevices = _adapter.getBondedDevices();
     }
 
     public List<BluetoothDevice> getFoundDevices() {
@@ -53,13 +53,9 @@ public class BluetoothController {
     }
 
     public boolean isBluetoothOn() {
-        //return _adapter.isEnabled();
-        return true;
+        return _adapter.isEnabled();
     }
 
-    public boolean isDeviceConnected(String address) {
-        return BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address) != null;
-    }
 
     public void startDiscovery(){
         _foundDevices.clear();
@@ -84,50 +80,9 @@ public class BluetoothController {
 
     }
 
-    /*private void setState(int state) {
-        switch (state) {
-            case BluetoothAdapter.STATE_OFF:
-                Log.d("STATE","BLA Off");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_off_white_48dp, R.anim.stay_still);
-                break;
-            case BluetoothAdapter.STATE_TURNING_OFF:
-                Log.d("STATE","BLA Turning off");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_off_white_48dp, R.anim.rotate);
-                break;
-            case BluetoothAdapter.STATE_ON:
-                Log.d("STATE","BLA On");
-
-                _btStateListener.setFAB(R.drawable.ic_radar, R.anim.stay_still);
-                break;
-            case BluetoothAdapter.STATE_TURNING_ON:
-                Log.d("STATE","BLA Turning on");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_white_48dp, R.anim.rotate);
-                break;
-            case BluetoothAdapter.STATE_CONNECTING:
-                Log.d("STATE","BLA Connecting");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_connect_white_48dp, R.anim.rotate);
-                break;
-            case BluetoothAdapter.STATE_CONNECTED:
-                Log.d("STATE","BLA Connected");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_connect_white_48dp, R.anim.stay_still);
-                break;
-            case BluetoothAdapter.STATE_DISCONNECTING:
-                Log.d("STATE","BLA Disconnecting");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_white_48dp, R.anim.rotate);
-                break;
-            case BluetoothAdapter.STATE_DISCONNECTED:
-                Log.d("STATE","BLA Disconnected");
-
-                _btStateListener.setFAB(R.drawable.ic_bluetooth_off_white_48dp, R.anim.stay_still);
-                break;
-        }
-    }*/
+    public void connectToDevice(BluetoothDevice device, SocketConnectedListener listener){
+        new ReadParamsThread(device, listener).start();
+    }
 
     private IntentFilter getFilter(){
         IntentFilter filter = new IntentFilter();
@@ -144,7 +99,6 @@ public class BluetoothController {
             String action = intent.getAction();
 
             if (action != null) {
-                _btStateListener.setFAB(intent);
                 switch (action) {
                     case BluetoothAdapter.ACTION_STATE_CHANGED:
                         Log.d("ACTION","BLA State changed");
@@ -162,7 +116,6 @@ public class BluetoothController {
                         Log.d("ACTION","BLA Discovery started");
                         break;
                     case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
-                        _btStateListener.setFoundDevices();
                         //_btStateListener.setFAB(R.drawable.ic_bluetooth_white_48dp, R.anim.stay_still);
                         Log.d("ACTION"," BLA Discovery finished");
                         break;
@@ -170,4 +123,86 @@ public class BluetoothController {
             }
         }
     };
+
+    private class ReadParamsThread extends Thread {
+        private final BluetoothSocket _socket;
+        private final BluetoothDevice _device;
+        private SocketConnectedListener _listener;
+
+        ReadParamsThread(BluetoothDevice device, SocketConnectedListener listener) {
+            _device = device;
+            _listener = listener;
+            BluetoothSocket temporarySocket = null;
+
+            try {
+                // Get a BluetoothSocket to connect with the given BluetoothDevice.
+                // MY_UUID is the app's UUID string, also used in the server code.
+                temporarySocket = device.createRfcommSocketToServiceRecord(device.getUuids()[0].getUuid());
+            } catch (IOException e) {
+                Log.e(TAG, "Socket's create() method failed", e);
+            }
+            _socket = temporarySocket;
+        }
+
+        public void run() {
+            // Cancel discovery because it otherwise slows down the connection.
+            _adapter.cancelDiscovery();
+
+            try {
+                // Connect to the remote device through the socket. This call blocks
+                // until it succeeds or throws an exception.
+                _socket.connect();
+            } catch (IOException connectException) {
+                // Unable to connect; close the socket and return.
+                try {
+                    _socket.close();
+                } catch (IOException closeException) {
+                    Log.e(TAG, "Could not close the client socket", closeException);
+                }
+                return;
+            }
+
+            if (_socket.isConnected()) {
+                _listener.hasConnected();
+                try {
+                    _socket.getOutputStream().write(0);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // The connection attempt succeeded. Perform work associated with
+            // the connection in a separate thread.
+            byte[] buffer = new byte[256];
+
+            while (_socket.isConnected()){
+                try {
+                    ByteArrayInputStream input = new ByteArrayInputStream(buffer);
+                    InputStream inputStream = _socket.getInputStream();
+                    inputStream.read(buffer);
+
+                    int data = input.read();
+
+                    Log.i("logging", String.valueOf(data));
+
+                    if (_dataUpdateListener != null){
+                        _dataUpdateListener.update(data);
+                    }
+                } catch (IOException e) {
+                    e.getMessage();
+                }
+            }
+
+            //manageMyConnectedSocket(mmSocket);
+        }
+
+        // Closes the connect socket and causes the thread to finish.
+        public void cancel() {
+            try {
+                _socket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Could not close the connect socket", e);
+            }
+        }
+    }
 }
