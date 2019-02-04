@@ -23,7 +23,7 @@ import android.widget.EditText;
 import android.widget.Button;
 
 import controllers.BluetoothController;
-import helper.TouchHelperCallback;
+import helpers.TouchHelperCallback;
 import constants.Constants;
 
 import adapters.DeviceListAdapter;
