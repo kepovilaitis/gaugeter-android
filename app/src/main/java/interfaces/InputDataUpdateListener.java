@@ -1,5 +1,7 @@
 package interfaces;
 
+import holders.RealTimeDataHolder;
+
 public interface InputDataUpdateListener {
-    void update(int data);
+    void update(RealTimeDataHolder data);
 }

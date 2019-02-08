@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 
 import com.example.kestutis.cargauges.R;
 
+import holders.RealTimeDataHolder;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
@@ -62,11 +63,11 @@ public class LiveDataFragment extends Fragment {
 
     private InputDataUpdateListener _inputDataListener = new InputDataUpdateListener() {
         @Override
-        public void update(int data) {
-            _oilPressureGaugeCard.setValue(data);
-            _oilTempGaugeCard.setValue(data);
-            _waterTempGaugeCard.setValue(data);
-            _chargeGaugeCard.setValue(data);
+        public void update(RealTimeDataHolder data) {
+            _oilPressureGaugeCard.setValue(data.getOilPressure());
+            _oilTempGaugeCard.setValue(data.getOilPressure());
+            _waterTempGaugeCard.setValue(data.getWaterTemperature());
+            _chargeGaugeCard.setValue(data.getCharge());
         }
     };
 }

@@ -7,15 +7,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 
+import holders.RealTimeDataHolder;
 import interfaces.InputDataUpdateListener;
 import interfaces.SocketConnectedListener;
 import lombok.Getter;
@@ -173,20 +174,32 @@ public class BluetoothController {
 
             // The connection attempt succeeded. Perform work associated with
             // the connection in a separate thread.
-            byte[] buffer = new byte[256];
 
             while (_socket.isConnected()){
                 try {
-                    ByteArrayInputStream input = new ByteArrayInputStream(buffer);
-                    InputStream inputStream = _socket.getInputStream();
-                    inputStream.read(buffer);
+                    BufferedReader r = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
 
-                    int data = input.read();
+                    for (String line; (line = r.readLine()) != null; ) {
+                        String[] numbers = line.split(";");
 
-                    Log.i("logging", String.valueOf(data));
+                        if (numbers.length == 4) {
+                            final RealTimeDataHolder data = new RealTimeDataHolder(
+                                    Integer.parseInt(numbers[0]),
+                                    Integer.parseInt(numbers[1]),
+                                    Integer.parseInt(numbers[2]),
+                                    Integer.parseInt(numbers[3])
+                            );
 
-                    if (_dataUpdateListener != null){
-                        _dataUpdateListener.update(data);
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (_dataUpdateListener != null) {
+                                        _dataUpdateListener.update(data);
+                                    }
+                                }
+                            });
+                        }
+                        Log.d("reading ", "values");
                     }
                 } catch (IOException e) {
                     e.getMessage();
