@@ -10,22 +10,22 @@
     android:orientation="vertical"
     android:background="@color/colorBackground">
 
-    <views.GaugeCardView_
+    <com.example.kestutis.cargauges.views.GaugeCardView_
         android:id="@id/oil_pressure_gauge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <views.GaugeCardView_
+    <com.example.kestutis.cargauges.views.GaugeCardView_
         android:id="@id/oil_temp_gauge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <views.GaugeCardView_
+    <com.example.kestutis.cargauges.views.GaugeCardView_
         android:id="@id/water_temp_gauge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <views.GaugeCardView_
+    <com.example.kestutis.cargauges.views.GaugeCardView_
         android:id="@id/charge_gauge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

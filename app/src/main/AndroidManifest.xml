@@ -3,18 +3,17 @@
     package="com.example.kestutis.cargauges">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
-
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
-        android:name="application.CarGauges"
+        android:name="com.example.kestutis.cargauges.CarGauges"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="activities.MainActivity"
+        <activity android:name="com.example.kestutis.cargauges.activities.MainActivity"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"   >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="activities.SettingsActivity"
+        <activity android:name="com.example.kestutis.cargauges.activities.SettingsActivity"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"   >
         </activity>
     </application>
