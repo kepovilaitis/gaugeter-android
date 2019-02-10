@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.example.kestutis.cargauges.constants.PreferenceKeys;
+
 import lombok.Getter;
 
 public class PreferenceController extends PreferenceKeys {
@@ -12,7 +13,7 @@ public class PreferenceController extends PreferenceKeys {
     @Getter
     private Context _context;
 
-    SharedPreferences _preferences;
+    private SharedPreferences _preferences;
 
     public PreferenceController(Context context) {
         _context = context;

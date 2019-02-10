@@ -7,11 +7,10 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.example.kestutis.cargauges.R;
-
-import java.util.Locale;
-
 import com.example.kestutis.cargauges.constants.Constants;
 import com.example.kestutis.cargauges.constants.Enums;
+
+import java.util.Locale;
 
 /**
  * View can only be used in 3:2 ratio when its in horizontal mode or
@@ -260,7 +259,7 @@ public class GaugeView extends View {
                 paint.setStrokeWidth(0.002f);
                 canvas.drawLine(0.5f, y1, 0.5f, y2, paint);
             }
-            canvas.rotate((200 / (_divisions * _subDivisions)), 0.5f, 0.5f);
+            canvas.rotate((200.0f / (_divisions * _subDivisions)), 0.5f, 0.5f);
         }
         canvas.restore();
     }
@@ -292,21 +291,21 @@ public class GaugeView extends View {
     }
 
     private void drawNeedle(final int w, final int h){
-        _needleCenterCoordinatesX = w / 2;
-        _needleCenterCoordinatesY = (h / 5) * 4;
+        _needleCenterCoordinatesX = w / 2.0f;
+        _needleCenterCoordinatesY = (h / 5.0f) * 4;
 
-        float needleTip = w - w / 30;
-        float upperNeedleEnd = _needleCenterCoordinatesY - h / 65;
-        float lowerNeedleEnd = _needleCenterCoordinatesY + h / 65;
+        float needleTip = w - w / 30.0f;
+        float upperNeedleEnd = _needleCenterCoordinatesY - h / 65.0f;
+        float lowerNeedleEnd = _needleCenterCoordinatesY + h / 65.0f;
 
         _linePath = new Path();
         _linePath.moveTo(_needleCenterCoordinatesX, upperNeedleEnd);
         _linePath.lineTo(needleTip, _needleCenterCoordinatesY);
         _linePath.lineTo(_needleCenterCoordinatesX, lowerNeedleEnd);
-        _linePath.lineTo(_needleCenterCoordinatesX - w / 15, _needleCenterCoordinatesY + h / 65);
-        _linePath.lineTo(_needleCenterCoordinatesX - w / 15 , upperNeedleEnd);
+        _linePath.lineTo(_needleCenterCoordinatesX - w / 15.0f, _needleCenterCoordinatesY + h / 65.0f);
+        _linePath.lineTo(_needleCenterCoordinatesX - w / 15.0f , upperNeedleEnd);
         _linePath.lineTo(_needleCenterCoordinatesX, upperNeedleEnd);
-        _linePath.addCircle(_needleCenterCoordinatesX, _needleCenterCoordinatesY, w / 30, Path.Direction.CW);
+        _linePath.addCircle(_needleCenterCoordinatesX, _needleCenterCoordinatesY, w / 30.0f, Path.Direction.CW);
         _linePath.close();
 
         _matrix.setRotate(170.0f, _needleCenterCoordinatesX, _needleCenterCoordinatesY);

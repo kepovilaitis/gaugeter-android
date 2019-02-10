@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import com.example.kestutis.cargauges.holders.RealTimeDataHolder;
 import com.example.kestutis.cargauges.interfaces.InputDataUpdateListener;
 import com.example.kestutis.cargauges.interfaces.SocketConnectionListener;
+
+import com.example.kestutis.cargauges.tools.ByteParser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -161,17 +163,23 @@ public class BluetoothController {
 
             while (_socket.isConnected()){
                 try {
-                    BufferedReader r = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
+                    DataInputStream inputStream = new DataInputStream(_socket.getInputStream());
+                    ByteParser parser = new ByteParser();
 
-                    for (String line; (line = r.readLine()) != null; ) {
-                        String[] numbers = line.split(";");
+                    if (parser.parseHeader(inputStream, 0)){
 
-                        if (numbers.length == 4) {
+                        float oilTemperature = parser.parseFloat(inputStream);
+                        float oilPressure = parser.parseFloat(inputStream);
+                        float waterTemperature = parser.parseFloat(inputStream);
+                        float charge = parser.parseFloat(inputStream);
+                        float checksum = parser.parseFloat(inputStream);
+
+                        if (checksum == oilTemperature + oilPressure + waterTemperature + charge){
                             final RealTimeDataHolder data = new RealTimeDataHolder(
-                                    Integer.parseInt(numbers[0]),
-                                    Integer.parseInt(numbers[1]),
-                                    Integer.parseInt(numbers[2]),
-                                    Integer.parseInt(numbers[3])
+                                    oilTemperature,
+                                    oilPressure,
+                                    waterTemperature,
+                                    charge
                             );
 
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -182,8 +190,11 @@ public class BluetoothController {
                                     }
                                 }
                             });
+
+                        } else {
+                            Log.d("Incorrect checksum", "!");
+                            return;
                         }
-                        Log.d("reading ", "values");
                     }
                 } catch (IOException e) {
                     _socketConnectionListener.hasDisconnected();

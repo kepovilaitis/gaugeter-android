@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.action_account_settings:
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 bundle.putParcelable("device", device);
                 LiveDataFragment_ fragment = new LiveDataFragment_();
                 fragment.setArguments(bundle);
-                fragmentTransaction.add(R.id.main_content, fragment);
+                fragmentTransaction.replace(R.id.main_content, fragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
             }

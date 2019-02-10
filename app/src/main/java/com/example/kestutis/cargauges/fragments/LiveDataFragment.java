@@ -2,24 +2,23 @@ package com.example.kestutis.cargauges.fragments;
 
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-
 import android.view.View;
 import android.view.View.OnClickListener;
-import com.example.kestutis.cargauges.R;
 
+import com.example.kestutis.cargauges.R;
 import com.example.kestutis.cargauges.activities.MainActivity;
+import com.example.kestutis.cargauges.helpers.AnimationHelper;
 import com.example.kestutis.cargauges.holders.RealTimeDataHolder;
 import com.example.kestutis.cargauges.views.GaugeCardView_;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ViewById;
-
 import com.example.kestutis.cargauges.constants.PreferenceKeys;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
 import com.example.kestutis.cargauges.controllers.PreferenceController;
 import com.example.kestutis.cargauges.interfaces.InputDataUpdateListener;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_gauges)
 public class LiveDataFragment extends Fragment {
@@ -30,6 +29,7 @@ public class LiveDataFragment extends Fragment {
     @ViewById(R.id.charge_gauge) GaugeCardView_ _chargeGaugeCard;
 
     private BluetoothDevice _device;
+    private BluetoothController _bluetoothController;
     private PreferenceController _preferences;
 
     @Override
@@ -39,24 +39,8 @@ public class LiveDataFragment extends Fragment {
         if (getArguments() != null) {
             _device = getArguments().getParcelable("device");
         }
-    }
 
-    @AfterViews
-    void setUpViews(){
-        getActivity().setTitle(getResources().getString(R.string.live_data));
-
-        _preferences = new PreferenceController(getContext());
-
-        _oilPressureGaugeCard.setText(R.string.text_oil_pressure);
-        _oilTempGaugeCard.setText(R.string.text_oil_temp);
-        _waterTempGaugeCard.setText(R.string.text_water_temp);
-        _chargeGaugeCard.setText(R.string.text_charge);
-
-        BluetoothController.getInstance().setDataUpdateListener(_inputDataListener);
-
-        _chargeGaugeCard.setUnits(R.string.volts);
-
-        ((MainActivity) getActivity()).getFab().setOnClickListener(_onClickListener);
+        _bluetoothController = BluetoothController.getInstance();
     }
 
     @Override
@@ -77,23 +61,53 @@ public class LiveDataFragment extends Fragment {
 
                 break;
         }
+
+        _chargeGaugeCard.setUnits(R.string.volts);
+    }
+
+    @AfterViews
+    void setUpViews(){
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null){
+            mainActivity.setTitle(getResources().getString(R.string.live_data));
+        }
+
+        _preferences = new PreferenceController(getContext());
+
+        _oilPressureGaugeCard.setText(R.string.text_oil_pressure);
+        _oilTempGaugeCard.setText(R.string.text_oil_temp);
+        _waterTempGaugeCard.setText(R.string.text_water_temp);
+        _chargeGaugeCard.setText(R.string.text_charge);
+
+        _bluetoothController.setDataUpdateListener(_inputDataListener);
+
+        ((MainActivity) getActivity()).getFab().setOnClickListener(_onClickListener);
+    }
+
+    @Override
+    public void onStop() {
+
+
+        super.onStop();
     }
 
     private InputDataUpdateListener _inputDataListener = new InputDataUpdateListener() {
         @Override
         public void update(RealTimeDataHolder data) {
-            _oilPressureGaugeCard.setValue(data.getOilPressure());
-            _oilTempGaugeCard.setValue(data.getOilPressure());
-            _waterTempGaugeCard.setValue(data.getWaterTemperature());
-            _chargeGaugeCard.setValue(data.getCharge());
+            if (isResumed()){
+                _oilPressureGaugeCard.setValue(data.getOilPressure());
+                _oilTempGaugeCard.setValue(data.getOilPressure());
+                _waterTempGaugeCard.setValue(data.getWaterTemperature());
+                _chargeGaugeCard.setValue(data.getCharge());
+            }
         }
     };
 
     private OnClickListener _onClickListener = new OnClickListener() {
         @Override
-        public void onClick(View v) {
-            ((FloatingActionButton) v).hide();
-            BluetoothController.getInstance().connectToDevice(_device);
+        public void onClick(View view) {
+            AnimationHelper.rotateAround(view, 0);
+            _bluetoothController.connectToDevice(_device);
         }
     };
 }

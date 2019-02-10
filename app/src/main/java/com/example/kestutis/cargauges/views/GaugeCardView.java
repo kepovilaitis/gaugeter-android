@@ -4,12 +4,11 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.kestutis.cargauges.R;
+import com.example.kestutis.cargauges.helpers.AnimationHelper;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -63,28 +62,20 @@ public class GaugeCardView extends LinearLayout {
     @Click({R.id.expand_btn})
     public void onClick(View view) {
         if (_gaugeChart.getVisibility() != View.GONE) {
-            view.startAnimation(getRotateAnimation(45.0f, 0.0f));
+            AnimationHelper.rotate(view, 45.0f, 0.0f);
             _gaugeChart.setVisibility(View.GONE);
         } else {
-            view.startAnimation(getRotateAnimation(0.0f, 45.0f));
+            AnimationHelper.rotate(view, 0.0f, 45.0f);
             _gaugeChart.setVisibility(View.VISIBLE);
         }
     }
 
-    private RotateAnimation getRotateAnimation(float fromDegrees, float toDegrees){
-        RotateAnimation rotate = new RotateAnimation(fromDegrees, toDegrees, Animation.RELATIVE_TO_SELF,  0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        rotate.setDuration(100);
-        rotate.setFillAfter(true);
-
-        return rotate;
-    }
-
-    public void setValue(double value){
+    public void setValue(float value){
         _gaugeView.setValue(value);
         _value.setText(String.format(Locale.US, "%5.1f", value));
 
         int _seconds = 0;
-        _lineData.addEntry(new Entry(_seconds, (float) value), 0);
+        _lineData.addEntry(new Entry(_seconds, value), 0);
         _gaugeChart.notifyDataSetChanged();
         _gaugeChart.invalidate();
     }

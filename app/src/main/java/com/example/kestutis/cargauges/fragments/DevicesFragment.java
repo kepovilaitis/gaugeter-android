@@ -19,14 +19,12 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Button;
 
+import com.example.kestutis.cargauges.R;
 import com.example.kestutis.cargauges.activities.MainActivity;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
 import com.example.kestutis.cargauges.helpers.TouchHelperCallback;
 import com.example.kestutis.cargauges.constants.Constants;
-
 import com.example.kestutis.cargauges.adapters.DeviceListAdapter;
-
-import com.example.kestutis.cargauges.R;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -40,7 +38,6 @@ public class DevicesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-
 
         _bluetooth = BluetoothController.getInstance();
         _devices = _bluetooth.getBondedDevices();

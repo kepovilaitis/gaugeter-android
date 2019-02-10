@@ -14,13 +14,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.kestutis.cargauges.R;
+import com.example.kestutis.cargauges.controllers.BluetoothController;
+import com.example.kestutis.cargauges.interfaces.ItemTouchMoveListener;
 
 import java.util.List;
 import java.util.Collections;
 import java.util.ArrayList;
 
-import com.example.kestutis.cargauges.controllers.BluetoothController;
-import com.example.kestutis.cargauges.interfaces.ItemTouchMoveListener;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
