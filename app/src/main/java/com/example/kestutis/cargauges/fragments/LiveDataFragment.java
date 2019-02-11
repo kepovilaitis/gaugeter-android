@@ -63,6 +63,7 @@ public class LiveDataFragment extends Fragment {
         }
 
         _chargeGaugeCard.setUnits(R.string.volts);
+        _bluetoothController.setDataUpdateListener(_inputDataListener);
     }
 
     @AfterViews
@@ -79,8 +80,6 @@ public class LiveDataFragment extends Fragment {
         _waterTempGaugeCard.setText(R.string.text_water_temp);
         _chargeGaugeCard.setText(R.string.text_charge);
 
-        _bluetoothController.setDataUpdateListener(_inputDataListener);
-
         ((MainActivity) getActivity()).getFab().setOnClickListener(_onClickListener);
     }
 
@@ -94,12 +93,10 @@ public class LiveDataFragment extends Fragment {
     private InputDataUpdateListener _inputDataListener = new InputDataUpdateListener() {
         @Override
         public void update(RealTimeDataHolder data) {
-            if (isResumed()){
-                _oilPressureGaugeCard.setValue(data.getOilPressure());
-                _oilTempGaugeCard.setValue(data.getOilPressure());
-                _waterTempGaugeCard.setValue(data.getWaterTemperature());
-                _chargeGaugeCard.setValue(data.getCharge());
-            }
+            _oilPressureGaugeCard.setValue(data.getOilPressure());
+            _oilTempGaugeCard.setValue(data.getOilPressure());
+            _waterTempGaugeCard.setValue(data.getWaterTemperature());
+            _chargeGaugeCard.setValue(data.getCharge());
         }
     };
 
