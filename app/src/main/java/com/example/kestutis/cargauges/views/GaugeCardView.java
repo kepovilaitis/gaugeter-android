@@ -25,11 +25,11 @@ import java.util.Locale;
 
 @EViewGroup(R.layout.gauge_card)
 public class GaugeCardView extends LinearLayout {
-    @ViewById(R.id.gauge_view) GaugeView _gaugeView;
-    @ViewById(R.id.gauge_text) TextView _gaugeText;
+    @ViewById(R.id.gaugeView) GaugeView _gaugeView;
+    @ViewById(R.id.gaugeText) TextView _gaugeText;
     @ViewById(R.id.value) TextView _value;
     @ViewById(R.id.units) TextView _units;
-    @ViewById(R.id.chart) LineChart _gaugeChart;
+    @ViewById(R.id.gaugeChart) LineChart _gaugeChart;
 
     private LineData _lineData;
 
@@ -59,7 +59,7 @@ public class GaugeCardView extends LinearLayout {
         _gaugeChart.invalidate(); // refresh
     }
 
-    @Click({R.id.expand_btn})
+    @Click({R.id.btnExpand})
     public void onClick(View view) {
         if (_gaugeChart.getVisibility() != View.GONE) {
             AnimationHelper.rotate(view, 45.0f, 0.0f);

@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         _fab = findViewById(R.id.fab);
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.main_content, new DevicesFragment());
+        fragmentTransaction.add(R.id.mainContent, new DevicesFragment());
         fragmentTransaction.commit();
     }
 
@@ -43,11 +43,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
+            case R.id.actionSettings:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.action_account_settings:
+            case R.id.actionAccountSettings:
                 return true;
         }
 
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 bundle.putParcelable("device", device);
                 LiveDataFragment_ fragment = new LiveDataFragment_();
                 fragment.setArguments(bundle);
-                fragmentTransaction.replace(R.id.main_content, fragment);
+                fragmentTransaction.replace(R.id.mainContent, fragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
             }
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private boolean isDevicesFragment(FragmentManager fragmentManager){
-            return fragmentManager.findFragmentById(R.id.main_content) instanceof DevicesFragment;
+            return fragmentManager.findFragmentById(R.id.mainContent) instanceof DevicesFragment;
         }
     };
 }

@@ -1,40 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <item type="id" name="main_content" />
-    <item type="id" name="list_view" />
-    <item type="id" name="paired_device_list_view"/>
-    <item type="id" name="found_device_list_view"/>
-    <item type="id" name="text_empty" />
+    <item type="id" name="mainContent" />
+    <item type="id" name="textEmpty" />
     <item type="id" name="fab" />
-    <item type="id" name="text_name" />
-    <item type="id" name="text_status" />
-    <item type="id" name="text_address" />
-    <item type="id" name="image_view" />
-    <item type="id" name="text_view" />
+    <item type="id" name="textName" />
+    <item type="id" name="textStatus" />
+    <item type="id" name="textAddress" />
+    <item type="id" name="imageView" />
     <item type="id" name="value" />
     <item type="id" name="units" />
 
+    <item type="id" name="textView" />
+    <item type="id" name="listView" />
+    <item type="id" name="listViewPairedDevice"/>
+    <item type="id" name="listViewFoundDevice"/>
+
     <item type="id" name="gauge"/>
+    <item type="id" name="gaugeOilTemp"/>
+    <item type="id" name="gaugeOilPressure"/>
+    <item type="id" name="gaugeWaterTemp"/>
+    <item type="id" name="gaugeCharge"/>
+    <item type="id" name="gaugeView"/>
+    <item type="id" name="gaugeText"/>
+    <item type="id" name="gaugeChart"/>
 
-    <item type="id" name="oil_temp_gauge"/>
-    <item type="id" name="oil_pressure_gauge"/>
-    <item type="id" name="water_temp_gauge"/>
-    <item type="id" name="charge_gauge"/>
-
-    <item type="id" name="gauge_view"/>
-    <item type="id" name="gauge_text"/>
-    <item type="id" name="chart"/>
-    <item type="id" name="expand_btn" />
+    <item type="id" name="btnExpand" />
+    <item type="id" name="btnSearch"/>
+    <item type="id" name="btnSubmit"/>
 
     <item type="id" name="search"/>
-    <item type="id" name="search_button"/>
-    <item type="id" name="relative_layout"/>
-    <item type="id" name="progress_bar"/>
+    <item type="id" name="relativeLayout"/>
+    <item type="id" name="progressBar"/>
 
-    <item type="id" name="action_settings"/>
-    <item type="id" name="action_account_settings"/>
+    <item type="id" name="actionSettings"/>
+    <item type="id" name="actionAccountSettings"/>
 
-    <item type="id" name="settings_container"/>
+    <item type="id" name="settingsContainer"/>
+
+    <item type="id" name="editUsername"/>
+    <item type="id" name="editPassword"/>
 
 </resources>

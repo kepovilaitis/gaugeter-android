@@ -179,10 +179,10 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
         ViewHolder(final View itemView) {
             super(itemView);
 
-            textName = itemView.findViewById(R.id.text_name);
-            textAddress = itemView.findViewById(R.id.text_address);
-            textStatus = itemView.findViewById(R.id.text_status);
-            progressBar = itemView.findViewById(R.id.progress_bar);
+            textName = itemView.findViewById(R.id.textName);
+            textAddress = itemView.findViewById(R.id.textAddress);
+            textStatus = itemView.findViewById(R.id.textStatus);
+            progressBar = itemView.findViewById(R.id.progressBar);
 
             // Handle item click and set the selection
             itemView.setOnClickListener(new View.OnClickListener() {

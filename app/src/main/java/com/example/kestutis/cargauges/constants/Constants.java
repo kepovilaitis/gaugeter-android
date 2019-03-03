@@ -17,4 +17,8 @@ public class Constants {
     public static final int SCALE_RED_DIVISIONS = 2;
 
     public static final int GAUGE_RED_SIDE = 1;
+
+    public static final String USERNAME = "user_username";
+    public static final String LOGGED_IN = "logged_in";
+    public static final String SESSION_ID = "session_id";
 }

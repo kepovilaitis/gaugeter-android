@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@id/relative_layout"
+    android:id="@id/relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -54,14 +54,14 @@
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
-            android:id="@id/paired_device_list_view"
+            android:id="@id/listViewPairedDevice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"
             android:choiceMode="singleChoice"/>
 
         <Button
-            android:id="@id/search_button"
+            android:id="@id/btnSearch"
             android:background="@drawable/search_button"
             android:layout_gravity="center"
             android:layout_width="200dp"
@@ -73,7 +73,7 @@
             android:fontFamily="@assets/font/worksans_regular"/>
 
         <ListView
-            android:id="@id/found_device_list_view"
+            android:id="@id/listViewFoundDevice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />

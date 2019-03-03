@@ -23,10 +23,10 @@ import org.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_gauges)
 public class LiveDataFragment extends Fragment {
 
-    @ViewById(R.id.oil_temp_gauge) GaugeCardView_ _oilTempGaugeCard;
-    @ViewById(R.id.oil_pressure_gauge) GaugeCardView_ _oilPressureGaugeCard;
-    @ViewById(R.id.water_temp_gauge) GaugeCardView_ _waterTempGaugeCard;
-    @ViewById(R.id.charge_gauge) GaugeCardView_ _chargeGaugeCard;
+    @ViewById(R.id.gaugeOilTemp) GaugeCardView_ _oilTempGaugeCard;
+    @ViewById(R.id.gaugeOilPressure) GaugeCardView_ _oilPressureGaugeCard;
+    @ViewById(R.id.gaugeWaterTemp) GaugeCardView_ _waterTempGaugeCard;
+    @ViewById(R.id.gaugeCharge) GaugeCardView_ _chargeGaugeCard;
 
     private BluetoothDevice _device;
     private BluetoothController _bluetoothController;

@@ -30,10 +30,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BluetoothController {
     @Getter private static BluetoothController _instance;
-    private BluetoothAdapter _adapter;
     @Setter private InputDataUpdateListener _dataUpdateListener;
-    private Set<BluetoothDevice> _foundDevices;
     @Setter private SocketConnectionListener _socketConnectionListener;
+
+    private BluetoothAdapter _adapter;
+    private Set<BluetoothDevice> _foundDevices;
     private Set<BluetoothDevice> _bondedDevices;
 
     public static void setInstance(Context base) {
@@ -58,7 +59,6 @@ public class BluetoothController {
         return _adapter.isEnabled();
     }
 
-
     public void startDiscovery(){
         _foundDevices.clear();
 
@@ -78,9 +78,7 @@ public class BluetoothController {
         }
     }
 
-    public void delete(BluetoothDevice device){
-
-    }
+    public void delete(BluetoothDevice device){ }
 
     public void connectToDevice(BluetoothDevice device){
         new ReadParamsThread(device).start();

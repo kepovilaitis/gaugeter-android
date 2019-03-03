@@ -2,17 +2,17 @@ package com.example.kestutis.cargauges.controllers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
+import com.example.kestutis.cargauges.constants.Constants;
 import com.example.kestutis.cargauges.constants.PreferenceKeys;
 
 import lombok.Getter;
 
 public class PreferenceController extends PreferenceKeys {
 
-    @Getter
-    private Context _context;
-
+    @Getter private Context _context;
     private SharedPreferences _preferences;
 
     public PreferenceController(Context context) {
@@ -21,10 +21,32 @@ public class PreferenceController extends PreferenceKeys {
         _preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    public void setEditorValue(String key, int value) {
+        Editor editor = _preferences.edit();
+        editor.putInt(key, value);
+        editor.commit();
+    }
+
+    public void setEditorValue(String key, long value) {
+        Editor editor = _preferences.edit();
+        editor.putLong(key, value);
+        editor.commit();
+    }
+
     public void setEditorValue(String key, String value) {
-        SharedPreferences.Editor editor = _preferences.edit();
+        Editor editor = _preferences.edit();
         editor.putString(key, value);
-        editor.apply();
+        editor.commit();
+    }
+
+    public void setEditorValue(String key, boolean value) {
+        Editor editor = _preferences.edit();
+        editor.putBoolean(key, value);
+        editor.commit();
+    }
+
+    public boolean getIsLoggedIn() {
+        return _preferences.getBoolean(Constants.LOGGED_IN, false);
     }
 
     public String getEditorValue(String key, String defaultValue) {

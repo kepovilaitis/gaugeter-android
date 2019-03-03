@@ -10,7 +10,7 @@
     android:paddingBottom="5dp">
 
     <com.example.kestutis.cargauges.views.GaugeView
-        android:id="@id/gauge_view"
+        android:id="@id/gaugeView"
         android:layout_width="360dp"
         android:layout_height="240dp"
         android:layout_gravity="center"
@@ -33,7 +33,7 @@
         android:paddingBottom="5dp">
 
         <TextView
-            android:id="@id/gauge_text"
+            android:id="@id/gaugeText"
             android:text="@string/text_oil_pressure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:textSize="25sp"
-            android:layout_toEndOf="@id/gauge_text"
+            android:layout_toEndOf="@id/gaugeText"
             android:fontFamily="@assets/font/worksans_regular"/>
 
         <TextView
@@ -62,17 +62,17 @@
             android:fontFamily="@assets/font/worksans_regular"/>
 
         <ImageView
-            android:id="@id/expand_btn"
+            android:id="@id/btnExpand"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:src="@drawable/plus"/>
 
         <com.github.mikephil.charting.charts.LineChart
-            android:id="@id/chart"
+            android:id="@id/gaugeChart"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:layout_below="@id/expand_btn"
+            android:layout_below="@id/btnExpand"
             android:visibility="gone"/>
 
     </RelativeLayout>

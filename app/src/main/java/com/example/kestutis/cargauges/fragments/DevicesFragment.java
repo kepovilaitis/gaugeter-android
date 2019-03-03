@@ -47,8 +47,8 @@ public class DevicesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View main = inflater.inflate(R.layout.fragment_devices, container, false);
 
-        RecyclerView _deviceList = main.findViewById(R.id.paired_device_list_view);
-        Button searchButton = main.findViewById(R.id.search_button);
+        RecyclerView _deviceList = main.findViewById(R.id.listViewPairedDevice);
+        Button searchButton = main.findViewById(R.id.btnSearch);
         EditText searchEditText = main.findViewById(R.id.search);
 
         setHasOptionsMenu(true);
