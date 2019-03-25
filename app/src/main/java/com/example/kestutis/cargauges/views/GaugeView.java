@@ -8,7 +8,6 @@ import android.view.View;
 
 import com.example.kestutis.cargauges.R;
 import com.example.kestutis.cargauges.constants.Constants;
-import com.example.kestutis.cargauges.constants.Enums;
 
 import java.util.Locale;
 
@@ -74,7 +73,7 @@ public class GaugeView extends View {
         _divisions = a.getInteger(R.styleable.GaugeView_divisions, Constants.SCALE_DIVISIONS);
         _subDivisions = a.getInteger(R.styleable.GaugeView_subdivisions, Constants.SCALE_SUBDIVISIONS);
 
-        _gaugeRedSide = a.getInteger(R.styleable.GaugeView_gaugeRedSide, Constants.GAUGE_RED_SIDE);
+        _gaugeRedSide = a.getInteger(R.styleable.GaugeView_gaugeRedSide, Constants.GAUGE_RED_SIDE_RIGHT);
         _redDivisions = a.getInteger(R.styleable.GaugeView_redDivisions, Constants.SCALE_RED_DIVISIONS);
 
         a.recycle();
@@ -212,19 +211,19 @@ public class GaugeView extends View {
             final Paint paint = new Paint(Paint.LINEAR_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
 
             switch (_gaugeRedSide){
-                case Enums.GAUGE_RED_SIDE_RIGHT:
+                case Constants.GAUGE_RED_SIDE_RIGHT:
 
                     if (i >= (totalTicks - _redDivisions)){
                         paint.setColor(Color.rgb(255,10,10));
                     }
                     break;
-                case Enums.GAUGE_RED_SIDE_LEFT:
+                case Constants.GAUGE_RED_SIDE_LEFT:
 
                     if (i < _redDivisions){
                         paint.setColor(Color.rgb(255,10,10));
                     }
                     break;
-                case Enums.GAUGE_RED_SIDE_BOTH:
+                case Constants.GAUGE_RED_SIDE_BOTH:
 
                     if (i < _redDivisions || i >= (totalTicks - _redDivisions)){
                         paint.setColor(Color.rgb(255,10,10));

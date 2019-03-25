@@ -4,6 +4,9 @@
     <item type="id" name="mainContent" />
     <item type="id" name="textEmpty" />
     <item type="id" name="fab" />
+    <item type="id" name="toolbar" />
+    <item type="id" name="drawerLayout" />
+    <item type="id" name="navigationView" />
     <item type="id" name="textName" />
     <item type="id" name="textStatus" />
     <item type="id" name="textAddress" />
@@ -12,6 +15,9 @@
     <item type="id" name="units" />
 
     <item type="id" name="textView" />
+    <item type="id" name="textEmail" />
+    <item type="id" name="textFullName" />
+
     <item type="id" name="listView" />
     <item type="id" name="listViewPairedDevice"/>
     <item type="id" name="listViewFoundDevice"/>
@@ -40,5 +46,7 @@
 
     <item type="id" name="editUsername"/>
     <item type="id" name="editPassword"/>
+
+    <item type="id" name="menuLogout"/>
 
 </resources>

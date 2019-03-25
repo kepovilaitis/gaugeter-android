@@ -8,6 +8,10 @@
     <string name="live_data">Live Data</string>
     <string name="measurement_system">Measurement System</string>
     <string name="login">Login</string>
+    <string name="logout">Log out</string>
+
+    <string name="menu_open">Open</string>
+    <string name="menu_close">Close</string>
 
     <string name="text_select_gauges">Select which gauges you want to see on the screen</string>
     <string name="text_select_measurement_system">Select your preferred measuring units</string>

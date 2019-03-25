@@ -16,9 +16,11 @@ public class Constants {
     public static final int SCALE_SUBDIVISIONS = 3;
     public static final int SCALE_RED_DIVISIONS = 2;
 
-    public static final int GAUGE_RED_SIDE = 1;
+    public static final int GAUGE_RED_SIDE_LEFT = 0;
+    public static final int GAUGE_RED_SIDE_RIGHT = 1;
+    public static final int GAUGE_RED_SIDE_BOTH = 2;
 
-    public static final String USERNAME = "user_username";
+    public static final String USER_ID = "user_id";
     public static final String LOGGED_IN = "logged_in";
-    public static final String SESSION_ID = "session_id";
+    public static final String TOKEN = "token";
 }

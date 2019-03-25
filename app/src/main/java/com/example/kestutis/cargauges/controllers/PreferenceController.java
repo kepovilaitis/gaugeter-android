@@ -24,29 +24,33 @@ public class PreferenceController extends PreferenceKeys {
     public void setEditorValue(String key, int value) {
         Editor editor = _preferences.edit();
         editor.putInt(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public void setEditorValue(String key, long value) {
         Editor editor = _preferences.edit();
         editor.putLong(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public void setEditorValue(String key, String value) {
         Editor editor = _preferences.edit();
         editor.putString(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public void setEditorValue(String key, boolean value) {
         Editor editor = _preferences.edit();
         editor.putBoolean(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public boolean getIsLoggedIn() {
         return _preferences.getBoolean(Constants.LOGGED_IN, false);
+    }
+
+    public String getUserId() {
+        return _preferences.getString(Constants.USER_ID, "user id");
     }
 
     public String getEditorValue(String key, String defaultValue) {
