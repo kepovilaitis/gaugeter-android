@@ -8,11 +8,11 @@ import lombok.Getter;
 @Getter
 public class UserInfoHolder
 {
-    public int _id;
-    public String _username;
-    public String _password;
-    public String _description;
-    public MEASUREMENT_SYSTEM _measurementSystem;
-    public String _token;
-    public String _refreshToken;
+    private int _id;
+    private String _username;
+    private String _password;
+    private String _description;
+    private MEASUREMENT_SYSTEM _measurementSystem;
+    private String _token;
+    private String _refreshToken;
 }

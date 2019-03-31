@@ -14,6 +14,9 @@
     <item type="id" name="value" />
     <item type="id" name="units" />
 
+    <item type="id" name="editUsernameLayout" />
+    <item type="id" name="editPasswordLayout" />
+
     <item type="id" name="textView" />
     <item type="id" name="textEmail" />
     <item type="id" name="textFullName" />
@@ -39,8 +42,8 @@
     <item type="id" name="relativeLayout"/>
     <item type="id" name="progressBar"/>
 
-    <item type="id" name="actionSettings"/>
-    <item type="id" name="actionAccountSettings"/>
+    <item type="id" name="menuSettings"/>
+    <item type="id" name="menuAccountSettings"/>
 
     <item type="id" name="settingsContainer"/>
 

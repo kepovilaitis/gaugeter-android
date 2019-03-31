@@ -49,6 +49,15 @@ public class PreferenceController extends PreferenceKeys {
         return _preferences.getBoolean(Constants.LOGGED_IN, false);
     }
 
+    public void deleteSessionData() {
+        Editor editor = _preferences.edit();
+        editor.remove(Constants.USER_ID);
+        editor.remove(Constants.TOKEN);
+        editor.remove(Constants.LOGGED_IN);
+
+        editor.apply();
+    }
+
     public String getUserId() {
         return _preferences.getString(Constants.USER_ID, "user id");
     }

@@ -6,13 +6,13 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 
 import com.example.kestutis.cargauges.interfaces.ItemTouchMoveListener;
 
-public class TouchHelperCallback extends ItemTouchHelper.Callback {
+public class TouchCallbackHelper extends ItemTouchHelper.Callback {
 
     private static final float ALPHA_FULL = 1.0f;
 
     private final ItemTouchMoveListener _adapter;
 
-    public TouchHelperCallback(ItemTouchMoveListener adapter) {
+    public TouchCallbackHelper(ItemTouchMoveListener adapter) {
         _adapter = adapter;
     }
 

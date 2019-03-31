@@ -2,16 +2,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
 
-    <item
-        android:id="@id/actionAccountSettings"
-        android:icon="@drawable/account"
-        android:title="@string/account"
-        app:showAsAction="ifRoom"/>
-
-    <item
-        android:id="@id/actionSettings"
-        android:icon="@drawable/settings"
-        android:title="@string/settings"
-        app:showAsAction="ifRoom"/>
 
 </menu>

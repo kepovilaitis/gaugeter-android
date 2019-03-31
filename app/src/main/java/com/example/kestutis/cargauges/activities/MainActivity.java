@@ -20,7 +20,6 @@ import android.view.MenuItem;
 
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
 import com.example.kestutis.cargauges.controllers.PreferenceController;
 import com.example.kestutis.cargauges.fragments.DevicesFragment;
@@ -35,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     private DrawerLayout _menuLayout;
     private ActionBarDrawerToggle _menuToggle;
     private NavigationView _navigationView;
+    @Getter private boolean _isActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +49,20 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.mainContent, new DevicesFragment());
         fragmentTransaction.commit();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        _isActive = true;
+    }
+
+    @Override
+    protected void onStop() {
+        _isActive = false;
+
+        super.onStop();
     }
 
     @Override
@@ -69,12 +83,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.actionSettings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                return true;
-            case R.id.actionAccountSettings:
-                return true;
             case android.R.id.home:
                 if (_menuToggle.isDrawerIndicatorEnabled()) {
                     menuToggle(false);
@@ -95,10 +103,24 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             return true;
         }
 
-        if (item.getItemId() == R.id.menuLogout) {
-            Toast.makeText(this, "Logout", Toast.LENGTH_LONG).show();
+        switch (item.getItemId()){
+            case R.id.menuLogout:
+                new PreferenceController(getApplicationContext()).deleteSessionData();
 
-            return false;
+                if (isActive()) {
+                    Intent i = new Intent(this, LoginActivity.class);
+                    startActivity(i);
+                    finish();
+                }
+
+                return true;
+            case R.id.menuSettings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+
+                return true;
+            case R.id.menuAccountSettings:
+                return true;
         }
 
         return false;

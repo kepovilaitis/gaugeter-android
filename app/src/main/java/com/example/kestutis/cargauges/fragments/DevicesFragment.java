@@ -22,7 +22,7 @@ import android.widget.Button;
 import com.example.kestutis.cargauges.R;
 import com.example.kestutis.cargauges.activities.MainActivity;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
-import com.example.kestutis.cargauges.helpers.TouchHelperCallback;
+import com.example.kestutis.cargauges.helpers.TouchCallbackHelper;
 import com.example.kestutis.cargauges.constants.Constants;
 import com.example.kestutis.cargauges.adapters.DeviceListAdapter;
 
@@ -57,7 +57,7 @@ public class DevicesFragment extends Fragment {
 
         _adapter = new DeviceListAdapter(_devices, ((MainActivity) getActivity()).getFab());
         _deviceList.setAdapter(_adapter);
-        ItemTouchHelper.Callback callback = new TouchHelperCallback(_adapter.getItemTouchMoveListener());
+        ItemTouchHelper.Callback callback = new TouchCallbackHelper(_adapter.getItemTouchMoveListener());
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(_deviceList);
 

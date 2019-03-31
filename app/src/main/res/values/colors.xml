@@ -11,4 +11,6 @@
     <color name="white">#ffffff</color>
     <color name="bg_row_background">#fa315b</color>
 
+    <color name="progress_bar_background">#40FFFFFF</color>
+
 </resources>

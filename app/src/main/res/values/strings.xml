@@ -13,6 +13,10 @@
     <string name="menu_open">Open</string>
     <string name="menu_close">Close</string>
 
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+
+
     <string name="text_select_gauges">Select which gauges you want to see on the screen</string>
     <string name="text_select_measurement_system">Select your preferred measuring units</string>
 
