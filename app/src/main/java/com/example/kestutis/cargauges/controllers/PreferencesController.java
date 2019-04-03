@@ -10,12 +10,12 @@ import com.example.kestutis.cargauges.constants.PreferenceKeys;
 
 import lombok.Getter;
 
-public class PreferenceController extends PreferenceKeys {
+public class PreferencesController extends PreferenceKeys {
 
     @Getter private Context _context;
     private SharedPreferences _preferences;
 
-    public PreferenceController(Context context) {
+    public PreferencesController(Context context) {
         _context = context;
 
         _preferences = PreferenceManager.getDefaultSharedPreferences(context);

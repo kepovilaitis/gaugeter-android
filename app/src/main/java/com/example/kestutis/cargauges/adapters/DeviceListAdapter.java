@@ -184,7 +184,6 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
             textStatus = itemView.findViewById(R.id.textStatus);
             progressBar = itemView.findViewById(R.id.progressBar);
 
-            // Handle item click and set the selection
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

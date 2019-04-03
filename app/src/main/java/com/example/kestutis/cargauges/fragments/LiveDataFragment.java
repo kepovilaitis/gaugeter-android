@@ -1,21 +1,21 @@
 package com.example.kestutis.cargauges.fragments;
 
-import android.bluetooth.BluetoothDevice;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.example.kestutis.cargauges.R;
 import com.example.kestutis.cargauges.activities.MainActivity;
-import com.example.kestutis.cargauges.helpers.AnimationHelper;
-import com.example.kestutis.cargauges.holders.RealTimeDataHolder;
-import com.example.kestutis.cargauges.views.GaugeCardView_;
+import com.example.kestutis.cargauges.holders.LiveDataHolder;
 import com.example.kestutis.cargauges.constants.PreferenceKeys;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
-import com.example.kestutis.cargauges.controllers.PreferenceController;
-import com.example.kestutis.cargauges.interfaces.InputDataUpdateListener;
+import com.example.kestutis.cargauges.controllers.PreferencesController;
 
+import com.example.kestutis.cargauges.views.GaugeCardView_;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
@@ -28,24 +28,15 @@ public class LiveDataFragment extends Fragment {
     @ViewById(R.id.gaugeWaterTemp) GaugeCardView_ _waterTempGaugeCard;
     @ViewById(R.id.gaugeCharge) GaugeCardView_ _chargeGaugeCard;
 
-    private BluetoothDevice _device;
     private BluetoothController _bluetoothController;
-    private PreferenceController _preferences;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            _device = getArguments().getParcelable("device");
-        }
-
-        _bluetoothController = BluetoothController.getInstance();
-    }
+    private PreferencesController _preferences;
+    private Disposable _liveDataDisposable;
 
     @Override
     public void onStart() {
         super.onStart();
+
+        _bluetoothController = BluetoothController.getInstance();
 
         switch (_preferences.getEditorValue(PreferenceKeys.PREFERENCE_MEASUREMENT_SYSTEM, "Metric")){
             case "Metric":
@@ -63,48 +54,73 @@ public class LiveDataFragment extends Fragment {
         }
 
         _chargeGaugeCard.setUnits(R.string.volts);
-        _bluetoothController.setDataUpdateListener(_inputDataListener);
+
+        BluetoothController.getInstance().getPublishSubjectLiveData()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(_liveDataObserver);
     }
 
     @AfterViews
     void setUpViews(){
         MainActivity mainActivity = (MainActivity) getActivity();
+
         if (mainActivity != null){
-            mainActivity.setTitle(getResources().getString(R.string.live_data));
+            mainActivity.setTitle(getString(R.string.live_data));
+            mainActivity.getFab().setOnClickListener(_onClickListener);
         }
 
-        _preferences = new PreferenceController(getContext());
+        _preferences = new PreferencesController(getContext());
 
         _oilPressureGaugeCard.setText(R.string.text_oil_pressure);
         _oilTempGaugeCard.setText(R.string.text_oil_temp);
         _waterTempGaugeCard.setText(R.string.text_water_temp);
         _chargeGaugeCard.setText(R.string.text_charge);
-
-        ((MainActivity) getActivity()).getFab().setOnClickListener(_onClickListener);
     }
 
     @Override
     public void onStop() {
+        if (_liveDataDisposable != null && !_liveDataDisposable.isDisposed()) {
+            _liveDataDisposable.dispose();
+        }
 
+        _bluetoothController.getLiveDataThread().cancel();
 
         super.onStop();
     }
 
-    private InputDataUpdateListener _inputDataListener = new InputDataUpdateListener() {
-        @Override
-        public void update(RealTimeDataHolder data) {
-            _oilPressureGaugeCard.setValue(data.getOilPressure());
-            _oilTempGaugeCard.setValue(data.getOilPressure());
-            _waterTempGaugeCard.setValue(data.getWaterTemperature());
-            _chargeGaugeCard.setValue(data.getCharge());
-        }
-    };
+    private void update(LiveDataHolder data) {
+        _oilPressureGaugeCard.setValue(data.getOilPressure());
+        _oilTempGaugeCard.setValue(data.getOilPressure());
+        _waterTempGaugeCard.setValue(data.getWaterTemperature());
+        _chargeGaugeCard.setValue(data.getCharge());
+    }
 
     private OnClickListener _onClickListener = new OnClickListener() {
         @Override
-        public void onClick(View view) {
-            AnimationHelper.rotateAround(view, 0);
-            _bluetoothController.connectToDevice(_device);
+        public void onClick(final View view) {
+            _bluetoothController.reconnectToDevice();
+        }
+    };
+
+    private Observer<LiveDataHolder> _liveDataObserver = new Observer<LiveDataHolder>() {
+        @Override
+        public void onSubscribe(Disposable d) {
+            _liveDataDisposable = d;
+        }
+
+        @Override
+        public void onNext(LiveDataHolder liveDataHolder) {
+            update(liveDataHolder);
+        }
+
+        @Override
+        public void onComplete() {
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            e.printStackTrace();
         }
     };
 }

@@ -47,19 +47,19 @@ public class DevicesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View main = inflater.inflate(R.layout.fragment_devices, container, false);
 
-        RecyclerView _deviceList = main.findViewById(R.id.listViewPairedDevice);
+        RecyclerView deviceList = main.findViewById(R.id.listViewPairedDevice);
         Button searchButton = main.findViewById(R.id.btnSearch);
         EditText searchEditText = main.findViewById(R.id.search);
 
         setHasOptionsMenu(true);
         searchButton.setOnClickListener(_searchListener);
-        _deviceList.setLayoutManager(new LinearLayoutManager(getContext()));
+        deviceList.setLayoutManager(new LinearLayoutManager(getContext()));
 
         _adapter = new DeviceListAdapter(_devices, ((MainActivity) getActivity()).getFab());
-        _deviceList.setAdapter(_adapter);
+        deviceList.setAdapter(_adapter);
         ItemTouchHelper.Callback callback = new TouchCallbackHelper(_adapter.getItemTouchMoveListener());
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(_deviceList);
+        itemTouchHelper.attachToRecyclerView(deviceList);
 
         searchEditText.addTextChangedListener(_queryTextListener);
 

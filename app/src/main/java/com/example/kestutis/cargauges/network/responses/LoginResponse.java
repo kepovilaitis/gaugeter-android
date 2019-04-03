@@ -1,42 +1,36 @@
 package com.example.kestutis.cargauges.network.responses;
 
-import android.util.Log;
 import android.view.View;
 import com.example.kestutis.cargauges.activities.LoginActivity;
 import com.example.kestutis.cargauges.constants.Constants;
-import com.example.kestutis.cargauges.controllers.PreferenceController;
+import com.example.kestutis.cargauges.controllers.PreferencesController;
 import com.example.kestutis.cargauges.holders.UserInfoHolder;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
 import lombok.AllArgsConstructor;
-import rx.Observer;
-
-import static android.content.ContentValues.TAG;
 
 @AllArgsConstructor
-public class LoginResponse implements Observer<UserInfoHolder> {
+public class LoginResponse implements SingleObserver<UserInfoHolder> {
     private LoginActivity _activity;
 
     @Override
-    public void onNext(UserInfoHolder userInfoHolder) {
-        Log.d(TAG, "In onNext()");
+    public void onSubscribe(Disposable d) {
+    }
+
+    @Override
+    public void onSuccess(UserInfoHolder userInfoHolder) {
         _activity.getProgressBar().setVisibility(View.GONE);
 
-        PreferenceController _preferenceController = new PreferenceController(_activity);
+        PreferencesController _preferencesController = new PreferencesController(_activity);
 
-        _preferenceController.setEditorValue(Constants.LOGGED_IN, true);
-        _preferenceController.setEditorValue(Constants.USER_ID, userInfoHolder.getUsername());
-        _preferenceController.setEditorValue(Constants.TOKEN, userInfoHolder.getToken());
+        _preferencesController.setEditorValue(Constants.LOGGED_IN, true);
+        _preferencesController.setEditorValue(Constants.USER_ID, userInfoHolder.getUsername());
+        _preferencesController.setEditorValue(Constants.TOKEN, userInfoHolder.getToken());
 
         _activity.startMainActivity();
     }
 
-    @Override
-    public void onCompleted() {
-        Log.d(TAG, "In onCompleted()");
-
-    }
-
     @Override public void onError(Throwable e) {
         e.printStackTrace();
-        Log.d(TAG, "In onError()");
     }
 }

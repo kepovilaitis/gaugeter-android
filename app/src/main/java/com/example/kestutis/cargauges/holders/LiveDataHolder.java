@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class RealTimeDataHolder {
+public class LiveDataHolder {
     private float _oilTemperature;
     private float _oilPressure;
     private float _waterTemperature;

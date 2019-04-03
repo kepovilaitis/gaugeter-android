@@ -1,13 +1,11 @@
 package com.example.kestutis.cargauges.activities;
 
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,31 +18,34 @@ import android.view.MenuItem;
 
 import android.view.View;
 import android.widget.TextView;
+import com.example.kestutis.cargauges.constants.Enums.CONNECTION_STATE;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
-import com.example.kestutis.cargauges.controllers.PreferenceController;
+import com.example.kestutis.cargauges.controllers.PreferencesController;
 import com.example.kestutis.cargauges.fragments.DevicesFragment;
 
 import com.example.kestutis.cargauges.R;
 import com.example.kestutis.cargauges.fragments.LiveDataFragment_;
-import com.example.kestutis.cargauges.interfaces.SocketConnectionListener;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener {
     @Getter FloatingActionButton _fab;
+    @Getter private boolean _isActive = false;
     private DrawerLayout _menuLayout;
     private ActionBarDrawerToggle _menuToggle;
-    private NavigationView _navigationView;
-    @Getter private boolean _isActive = false;
+    private Disposable _stateDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        setContentView(R.layout.activity_main);
         setUpNavigationDrawer();
 
-        BluetoothController.getInstance().setSocketConnectionListener(_socketConnectionListener );
         _fab = findViewById(R.id.fab);
+        BluetoothController.getInstance().getPublishSubjectState().subscribe(new StateObserver());
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.mainContent, new DevicesFragment());
@@ -60,6 +61,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     @Override
     protected void onStop() {
+        if (_stateDisposable != null && !_stateDisposable.isDisposed()) {
+            _stateDisposable.dispose();
+        }
+
         _isActive = false;
 
         super.onStop();
@@ -105,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         switch (item.getItemId()){
             case R.id.menuLogout:
-                new PreferenceController(getApplicationContext()).deleteSessionData();
+                new PreferencesController(getApplicationContext()).deleteSessionData();
 
                 if (isActive()) {
                     Intent i = new Intent(this, LoginActivity.class);
@@ -128,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     private void setUpNavigationDrawer() {
         _menuLayout = findViewById(R.id.drawerLayout);
-        _navigationView = findViewById(R.id.navigationView);
+        NavigationView navigationView = findViewById(R.id.navigationView);
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         ActionBar actionBar = getSupportActionBar();
@@ -136,11 +141,11 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
 
-        PreferenceController preferenceController = new PreferenceController(getApplicationContext());
+        PreferencesController preferencesController = new PreferencesController(getApplicationContext());
 
-        View headerView = _navigationView.getHeaderView(0);
+        View headerView = navigationView.getHeaderView(0);
         TextView navUsername = headerView.findViewById(R.id.textFullName);
-        navUsername.setText(preferenceController.getUserId());
+        navUsername.setText(preferencesController.getUserId());
 
         _menuToggle = new ActionBarDrawerToggle(this, _menuLayout, R.string.menu_open, R.string.menu_close) {
             public void onDrawerClosed(View view) {
@@ -153,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         };
 
         _menuLayout.addDrawerListener(_menuToggle);
-        _navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this);
 
     }
 
@@ -169,44 +174,45 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         return false;
     }
 
-    @Getter
-    private SocketConnectionListener _socketConnectionListener = new SocketConnectionListener() {
+    @NoArgsConstructor
+    private class StateObserver implements Observer<CONNECTION_STATE> {
         @Override
-        public void hasConnected(BluetoothDevice device) {
-            _fab.hide();
+        public void onSubscribe(Disposable d) {
+            _stateDisposable = d;
+        }
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
+        @Override
+        public void onNext(CONNECTION_STATE connection_state) {
+            switch (connection_state) {
+                case HAS_DISCONNECTED:
+                    _fab.setImageDrawable(getDrawable(R.drawable.ic_refresh));
+                    _fab.show();
 
-            if (isDevicesFragment(fragmentManager)){
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("device", device);
+                    break;
+                case IS_CONNECTING:
+                    _fab.setImageDrawable(getDrawable(R.drawable.cancel));
+                    _fab.show();
 
-                LiveDataFragment_ fragment = new LiveDataFragment_();
+                    break;
+                case HAS_CONNECTED:
+                    _fab.hide();
 
-                fragment.setArguments(bundle);
-                fragmentTransaction.replace(R.id.mainContent, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.mainContent, new LiveDataFragment_());
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+
+                    break;
             }
         }
 
         @Override
-        public void isConnecting() {
-            if (isDevicesFragment(getSupportFragmentManager())) {
-                _fab.setImageDrawable(getDrawable(R.drawable.cancel));
-                _fab.show();
-            }
+        public void onComplete() {
+
         }
 
         @Override
-        public void hasDisconnected() {
-            _fab.setImageDrawable(getDrawable(R.drawable.ic_refresh));
-            _fab.show();
+        public void onError(Throwable e) {
         }
-
-        private boolean isDevicesFragment(FragmentManager fragmentManager){
-            return fragmentManager.findFragmentById(R.id.mainContent) instanceof DevicesFragment;
-        }
-    };
+    }
 }

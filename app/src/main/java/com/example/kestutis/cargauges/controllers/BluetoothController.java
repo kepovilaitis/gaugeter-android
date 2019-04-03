@@ -7,8 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import java.io.*;
@@ -16,22 +14,30 @@ import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.example.kestutis.cargauges.holders.RealTimeDataHolder;
-import com.example.kestutis.cargauges.interfaces.InputDataUpdateListener;
-import com.example.kestutis.cargauges.interfaces.SocketConnectionListener;
+import com.example.kestutis.cargauges.constants.Enums.CONNECTION_STATE;
+import com.example.kestutis.cargauges.holders.LiveDataHolder;
 
 import com.example.kestutis.cargauges.tools.ByteParser;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.subjects.PublishSubject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 //https://stackoverflow.com/questions/35647767/android-bluetooth-wake-up-device
 
 @NoArgsConstructor
 public class BluetoothController {
     @Getter private static BluetoothController _instance;
-    @Setter private InputDataUpdateListener _dataUpdateListener;
-    @Setter private SocketConnectionListener _socketConnectionListener;
+    @Getter private PublishSubject<CONNECTION_STATE> _publishSubjectState = PublishSubject.create();
+    @Getter private PublishSubject<LiveDataHolder> _publishSubjectLiveData = PublishSubject.create();
+    @Getter private ReadLiveDataThread _liveDataThread;
+    @Getter private BluetoothDevice _device;
 
     private BluetoothAdapter _adapter;
     private Set<BluetoothDevice> _foundDevices;
@@ -80,8 +86,16 @@ public class BluetoothController {
 
     public void delete(BluetoothDevice device){ }
 
+    public void reconnectToDevice(){
+        if (_device != null){
+            connectToDevice(_device);
+        }
+    }
+
     public void connectToDevice(BluetoothDevice device){
-        new ReadParamsThread(device).start();
+
+        _liveDataThread = new ReadLiveDataThread(device);
+        _liveDataThread.start();
     }
 
     private IntentFilter getFilter(){
@@ -124,15 +138,14 @@ public class BluetoothController {
         }
     };
 
-    private class ReadParamsThread extends Thread {
+    public class ReadLiveDataThread extends Thread {
         private BluetoothSocket _socket = null;
-        private BluetoothDevice _device;
 
-        ReadParamsThread(BluetoothDevice device) {
+        ReadLiveDataThread(BluetoothDevice device) {
             _device = device;
 
             try {
-                _socketConnectionListener.isConnecting();
+                _publishSubjectState.onNext(CONNECTION_STATE.IS_CONNECTING);
                 _socket = _device.createRfcommSocketToServiceRecord(_device.getUuids()[0].getUuid());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -147,6 +160,7 @@ public class BluetoothController {
             } catch (IOException e) {
                 e.printStackTrace();
                 cancel();
+
                 return;
             }
 
@@ -156,7 +170,9 @@ public class BluetoothController {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                _socketConnectionListener.hasConnected(_device);
+
+                _publishSubjectState.onNext(CONNECTION_STATE.HAS_CONNECTED);
+                Log.d("LiveDataThread", "Has connected");
             }
 
             while (_socket.isConnected()){
@@ -173,29 +189,22 @@ public class BluetoothController {
                         float checksum = parser.parseFloat(inputStream);
 
                         if (checksum == oilTemperature + oilPressure + waterTemperature + charge){
-                            final RealTimeDataHolder data = new RealTimeDataHolder(
+
+                            _publishSubjectLiveData.onNext(new LiveDataHolder(
                                     oilTemperature,
                                     oilPressure,
                                     waterTemperature,
                                     charge
-                            );
-
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (_dataUpdateListener != null) {
-                                        _dataUpdateListener.update(data);
-                                    }
-                                }
-                            });
-
+                            ));
                         } else {
                             Log.d("Incorrect checksum", "!");
                             return;
                         }
                     }
                 } catch (IOException e) {
-                    _socketConnectionListener.hasDisconnected();
+
+                    _publishSubjectState.onNext(CONNECTION_STATE.HAS_DISCONNECTED);
+
                     e.printStackTrace();
                     cancel();
                 }
@@ -205,7 +214,7 @@ public class BluetoothController {
         public void cancel() {
             try {
                 _socket.close();
-                _socketConnectionListener.hasDisconnected();
+                _publishSubjectState.onNext(CONNECTION_STATE.HAS_DISCONNECTED);
             } catch (IOException e) {
                 e.printStackTrace();
             }

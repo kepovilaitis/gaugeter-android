@@ -60,12 +60,14 @@ public class GaugeCardView extends LinearLayout {
     }
 
     @Click({R.id.btnExpand})
-    public void onClick(View view) {
+    void onClick(View view) {
         if (_gaugeChart.getVisibility() != View.GONE) {
-            AnimationHelper.rotate(view, 45.0f, 0.0f);
+            view.startAnimation(AnimationHelper.getRotateToAngle(45.0f, 0.0f));
+
             _gaugeChart.setVisibility(View.GONE);
         } else {
-            AnimationHelper.rotate(view, 0.0f, 45.0f);
+            view.startAnimation(AnimationHelper.getRotateToAngle(0.0f, 45.0f));
+
             _gaugeChart.setVisibility(View.VISIBLE);
         }
     }

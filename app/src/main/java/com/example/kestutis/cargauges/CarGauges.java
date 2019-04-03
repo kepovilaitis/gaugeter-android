@@ -12,6 +12,5 @@ public class CarGauges extends Application {
         super.attachBaseContext(base);
 
         BluetoothController.setInstance(base);
-
     }
 }
