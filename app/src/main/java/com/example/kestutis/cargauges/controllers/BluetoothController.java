@@ -1,13 +1,13 @@
 package com.example.kestutis.cargauges.controllers;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass.Device.Major;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 import java.io.*;
 import java.util.Set;
-import java.util.List;
 import java.util.ArrayList;
 
 import com.example.kestutis.cargauges.constants.Enums.CONNECTION_STATUS;
@@ -25,10 +25,9 @@ public class BluetoothController {
     @Getter private PublishSubject<LiveDataHolder> _liveDataSubject = PublishSubject.create();
     @Getter private ReadLiveDataThread _liveDataThread;
     @Getter private BluetoothDevice _device;
+    @Getter private ArrayList<BluetoothDevice> _devices;
 
     private BluetoothAdapter _adapter;
-//    private Set<BluetoothDevice> _foundDevices;
-    private Set<BluetoothDevice> _bondedDevices;
 
     public static void setInstance() {
         _instance = new BluetoothController();
@@ -36,15 +35,18 @@ public class BluetoothController {
 
     private BluetoothController() {
         _adapter = BluetoothAdapter.getDefaultAdapter();
-        _bondedDevices = _adapter.getBondedDevices();
+        _devices = filterDevices(_adapter.getBondedDevices());
     }
 
-//    public List<BluetoothDevice> getFoundDevices() {
-//        return new ArrayList<>(_foundDevices);
-//    }
+    private ArrayList<BluetoothDevice> filterDevices(Set<BluetoothDevice> devices) {
+        ArrayList<BluetoothDevice> filteredDevices = new ArrayList<>();
 
-    public List<BluetoothDevice> getBondedDevices() {
-        return new ArrayList<>(_bondedDevices);
+        for (BluetoothDevice device : devices) {
+            if ( device.getBluetoothClass().getMajorDeviceClass() == Major.UNCATEGORIZED)
+                filteredDevices.add(device);
+        }
+
+        return filteredDevices;
     }
 
     public boolean isBluetoothOn() {

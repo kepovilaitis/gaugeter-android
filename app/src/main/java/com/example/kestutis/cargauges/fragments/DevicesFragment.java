@@ -37,7 +37,7 @@ public class DevicesFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         _bluetoothController = BluetoothController.getInstance();
-        _devices = _bluetoothController.getBondedDevices();
+        _devices = _bluetoothController.getDevices();
     }
 
     @Override
