@@ -153,6 +153,8 @@ public class BluetoothController {
                     DataInputStream inputStream = new DataInputStream(_socket.getInputStream());
                     ByteParser parser = new ByteParser();
 
+                    Log.d("Thread status", getState().name());
+
                     if (parser.parseHeader(inputStream, 0)){
 
                         float oilTemperature = parser.parseFloat(inputStream);

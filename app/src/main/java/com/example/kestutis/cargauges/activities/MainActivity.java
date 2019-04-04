@@ -49,19 +49,19 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         _fab = findViewById(R.id.fab);
         _progressBar = findViewById(R.id.progressBar);
 
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.mainContent, new DevicesFragment());
+        fragmentTransaction.commit();
+
         BluetoothController.getInstance().getStateSubject()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(_statusObserver);
-
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.mainContent, new DevicesFragment());
-        fragmentTransaction.commit();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
 
         _isActive = true;
     }
@@ -75,6 +75,15 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         _isActive = false;
 
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
+            _statusDisposable.dispose();
+        }
+
+        super.onDestroy();
     }
 
     @Override

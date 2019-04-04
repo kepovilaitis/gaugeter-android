@@ -1,5 +1,6 @@
 package com.example.kestutis.cargauges.fragments;
 
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -37,6 +38,21 @@ public class LiveDataFragment extends Fragment {
     private MainActivity _mainActivity;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        BluetoothController.getInstance().getLiveDataSubject()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(_liveDataObserver);
+
+        BluetoothController.getInstance().getStateSubject()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(_statusObserver);
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
 
@@ -58,16 +74,6 @@ public class LiveDataFragment extends Fragment {
         }
 
         _chargeGaugeCard.setUnits(R.string.volts);
-
-        BluetoothController.getInstance().getLiveDataSubject()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(_liveDataObserver);
-
-        BluetoothController.getInstance().getStateSubject()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(_statusObserver);
     }
 
     @AfterViews
@@ -89,7 +95,7 @@ public class LiveDataFragment extends Fragment {
     }
 
     @Override
-    public void onStop() {
+    public void onDestroy() {
         if (_liveDataDisposable != null && !_liveDataDisposable.isDisposed()) {
             _liveDataDisposable.dispose();
         }
@@ -100,7 +106,7 @@ public class LiveDataFragment extends Fragment {
 
         _bluetoothController.getLiveDataThread().cancel();
 
-        super.onStop();
+        super.onDestroy();
     }
 
     private void update(LiveDataHolder data) {
