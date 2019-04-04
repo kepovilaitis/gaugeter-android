@@ -38,4 +38,9 @@
     <string name="pref_measurement_system">Measurement System</string>
     <string name="pref_gauges">Gauges</string>
 
+    <string name="message_connection_closed">Connection to device closed!</string>
+
+    <string name="error_bad_credentials">Wrong username or password.</string>
+    <string name="error_internal_server">Server error</string>
+
 </resources>

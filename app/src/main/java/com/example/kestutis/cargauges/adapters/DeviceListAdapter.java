@@ -2,8 +2,6 @@ package com.example.kestutis.cargauges.adapters;
 
 import android.bluetooth.BluetoothDevice;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,36 +12,37 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.kestutis.cargauges.R;
+import com.example.kestutis.cargauges.constants.Enums.CONNECTION_STATUS;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
-import com.example.kestutis.cargauges.interfaces.ItemTouchMoveListener;
 
 import java.util.List;
-import java.util.Collections;
 import java.util.ArrayList;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
-@AllArgsConstructor
 public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.ViewHolder> implements Filterable {
     private List<BluetoothDevice> _devices, filteredDevices;
-    private FloatingActionButton _fab;
     private int _selectedPos = -1;
-    private View _view;
     private boolean _isClickable = true;
+    private Disposable _statusDisposable;
 
-    public DeviceListAdapter(List<BluetoothDevice> devices, FloatingActionButton fab){
+    public DeviceListAdapter(List<BluetoothDevice> devices){
         _devices = devices;
         filteredDevices = devices;
-        _fab = fab;
-        _fab.setOnClickListener(_fabOnClickListener);
+
+        BluetoothController.getInstance().getStateSubject()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(_statusObserver);
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        _view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_device, parent, false);
-        return new ViewHolder(_view);
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_device, parent, false));
     }
 
     @Override
@@ -61,6 +60,13 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
         viewHolder.textName.setText(device.getName());
         viewHolder.textAddress.setText(device.getAddress());
         viewHolder.textStatus.setText(/*device.getBondState()*/"kantakt est");
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
+            _statusDisposable.dispose();
+        }
     }
 
     @Override
@@ -113,60 +119,42 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
         return list;
     }
 
-    private void showFAB(){
-        if (_selectedPos >= 0) {
-            _fab.show();
-        } else {
-            _fab.hide();
-        }
+    private void startProgress() {
+        notifyItemChanged(_selectedPos);
+
+        _isClickable = false;
     }
 
-    private View.OnClickListener _fabOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            _selectedPos = -1;
-            notifyDataSetChanged();
-            showFAB();
-            _isClickable = true;
-        }
-    };
+    private void stopProgress() {
+        _selectedPos = -1;
+        _isClickable = true;
 
-    @Getter
-    private ItemTouchMoveListener _itemTouchMoveListener = new ItemTouchMoveListener() {
+        notifyDataSetChanged();
+    }
+
+    private Observer<CONNECTION_STATUS> _statusObserver = new Observer<CONNECTION_STATUS>() {
         @Override
-        public boolean onItemMove(int fromPosition, int toPosition) {
-            Collections.swap(_devices, fromPosition, toPosition);
-            notifyItemMoved(fromPosition, toPosition);
-            return true;
+        public void onSubscribe(Disposable d) {
+            _statusDisposable = d;
         }
 
         @Override
-        public void onItemDismiss(final int position) {
-            final BluetoothDevice device = _devices.get(position);
-
-            if (_selectedPos == position){
-                _selectedPos = -1;
-                showFAB();
-            } else if ( _selectedPos > position){
-                _selectedPos -= 1;
+        public void onNext(CONNECTION_STATUS connection_STATUS) {
+            if (connection_STATUS == CONNECTION_STATUS.CONNECTING) {
+                startProgress();
+            } else {
+                stopProgress();
             }
+        }
 
-            _devices.remove(position);
-            notifyItemRemoved(position);
+        @Override
+        public void onComplete() {
 
-            Snackbar.make( _view, "Deleted the device", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("UNDO", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            _devices.add(position, device);
-                            _isClickable = true;
-                            _selectedPos = -1;
-                            notifyDataSetChanged();
-                            Snackbar.make(view, "Device is restored!", Snackbar.LENGTH_SHORT).show();
-                        }
-                    })
-                    .setDuration(5000)
-                    .show();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            stopProgress();
         }
     };
 
@@ -192,11 +180,8 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
                         return;
 
                     _selectedPos = getLayoutPosition();
-                    notifyItemChanged(_selectedPos);
 
-                    showFAB();
-                    _isClickable = false;
-
+                    startProgress();
                     BluetoothController.getInstance().connectToDevice(_devices.get(_selectedPos));
                 }
             });

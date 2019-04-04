@@ -2,11 +2,9 @@ package com.example.kestutis.cargauges.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import com.example.kestutis.cargauges.R;
 import com.example.kestutis.cargauges.controllers.PreferencesController;
 import com.example.kestutis.cargauges.helpers.KeyboardHelper;
@@ -16,12 +14,10 @@ import com.example.kestutis.cargauges.network.GaugeterClient;
 import com.example.kestutis.cargauges.network.responses.LoginResponse;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import lombok.Getter;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
     private EditText _userId;
     private EditText _password;
-    @Getter private FrameLayout _progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     private void login(LoginHolder loginHolder) {
         KeyboardHelper.hideKeyboard(this);
 
-        _progressBar.setVisibility(View.VISIBLE);
+        startProgressBar();
 
         GaugeterClient.getInstance()
                 .login(loginHolder)

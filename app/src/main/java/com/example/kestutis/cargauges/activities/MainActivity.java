@@ -11,31 +11,33 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import android.view.View;
 import android.widget.TextView;
-import com.example.kestutis.cargauges.constants.Enums.CONNECTION_STATE;
+import com.example.kestutis.cargauges.constants.Enums.CONNECTION_STATUS;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
 import com.example.kestutis.cargauges.controllers.PreferencesController;
 import com.example.kestutis.cargauges.fragments.DevicesFragment;
 
 import com.example.kestutis.cargauges.R;
 import com.example.kestutis.cargauges.fragments.LiveDataFragment_;
+import com.example.kestutis.cargauges.tools.SnackbarNotifier;
 import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity implements OnNavigationItemSelectedListener {
     @Getter FloatingActionButton _fab;
     @Getter private boolean _isActive = false;
+
     private DrawerLayout _menuLayout;
     private ActionBarDrawerToggle _menuToggle;
-    private Disposable _stateDisposable;
+    private Disposable _statusDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,12 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         setUpNavigationDrawer();
 
         _fab = findViewById(R.id.fab);
-        BluetoothController.getInstance().getPublishSubjectState().subscribe(new StateObserver());
+        _progressBar = findViewById(R.id.progressBar);
+
+        BluetoothController.getInstance().getStateSubject()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(_statusObserver);
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.mainContent, new DevicesFragment());
@@ -61,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     @Override
     protected void onStop() {
-        if (_stateDisposable != null && !_stateDisposable.isDisposed()) {
-            _stateDisposable.dispose();
+        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
+            _statusDisposable.dispose();
         }
 
         _isActive = false;
@@ -82,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -174,28 +182,24 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         return false;
     }
 
-    @NoArgsConstructor
-    private class StateObserver implements Observer<CONNECTION_STATE> {
+    private void showSnackbar(int message) {
+        SnackbarNotifier.showMessage(findViewById(R.id.mainContent), message);
+    }
+
+    private Observer<CONNECTION_STATUS> _statusObserver = new Observer<CONNECTION_STATUS>() {
         @Override
         public void onSubscribe(Disposable d) {
-            _stateDisposable = d;
+            _statusDisposable = d;
         }
 
         @Override
-        public void onNext(CONNECTION_STATE connection_state) {
-            switch (connection_state) {
-                case HAS_DISCONNECTED:
-                    _fab.setImageDrawable(getDrawable(R.drawable.ic_refresh));
-                    _fab.show();
+        public void onNext(CONNECTION_STATUS connection_status) {
+            switch (connection_status) {
+                case DISCONNECTED:
+                    showSnackbar(R.string.message_connection_closed);
 
                     break;
-                case IS_CONNECTING:
-                    _fab.setImageDrawable(getDrawable(R.drawable.cancel));
-                    _fab.show();
-
-                    break;
-                case HAS_CONNECTED:
-                    _fab.hide();
+                case CONNECTED:
 
                     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.mainContent, new LiveDataFragment_());
@@ -208,11 +212,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         @Override
         public void onComplete() {
-
         }
 
         @Override
         public void onError(Throwable e) {
         }
-    }
+    };
 }

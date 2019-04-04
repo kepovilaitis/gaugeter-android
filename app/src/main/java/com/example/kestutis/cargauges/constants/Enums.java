@@ -7,9 +7,10 @@ public class Enums {
         IMPERIAL
     }
 
-    public enum CONNECTION_STATE {
-        IS_CONNECTING,
-        HAS_CONNECTED,
-        HAS_DISCONNECTED
+    public enum CONNECTION_STATUS {
+        CONNECTING,
+        FAILED_CONNECTING,
+        CONNECTED,
+        DISCONNECTED
     }
 }

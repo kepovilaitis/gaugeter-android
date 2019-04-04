@@ -1,11 +1,13 @@
 package com.example.kestutis.cargauges.fragments;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.example.kestutis.cargauges.R;
 import com.example.kestutis.cargauges.activities.MainActivity;
+import com.example.kestutis.cargauges.constants.Enums.CONNECTION_STATUS;
 import com.example.kestutis.cargauges.holders.LiveDataHolder;
 import com.example.kestutis.cargauges.constants.PreferenceKeys;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
@@ -31,6 +33,8 @@ public class LiveDataFragment extends Fragment {
     private BluetoothController _bluetoothController;
     private PreferencesController _preferences;
     private Disposable _liveDataDisposable;
+    private Disposable _statusDisposable;
+    private MainActivity _mainActivity;
 
     @Override
     public void onStart() {
@@ -55,19 +59,25 @@ public class LiveDataFragment extends Fragment {
 
         _chargeGaugeCard.setUnits(R.string.volts);
 
-        BluetoothController.getInstance().getPublishSubjectLiveData()
+        BluetoothController.getInstance().getLiveDataSubject()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(_liveDataObserver);
+
+        BluetoothController.getInstance().getStateSubject()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(_statusObserver);
     }
 
     @AfterViews
     void setUpViews(){
-        MainActivity mainActivity = (MainActivity) getActivity();
 
-        if (mainActivity != null){
-            mainActivity.setTitle(getString(R.string.live_data));
-            mainActivity.getFab().setOnClickListener(_onClickListener);
+        _mainActivity = (MainActivity) getActivity();
+
+        if (_mainActivity != null){
+            _mainActivity.setTitle(getString(R.string.live_data));
+            _mainActivity.getFab().setOnClickListener(_onClickListener);
         }
 
         _preferences = new PreferencesController(getContext());
@@ -82,6 +92,10 @@ public class LiveDataFragment extends Fragment {
     public void onStop() {
         if (_liveDataDisposable != null && !_liveDataDisposable.isDisposed()) {
             _liveDataDisposable.dispose();
+        }
+
+        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
+            _statusDisposable.dispose();
         }
 
         _bluetoothController.getLiveDataThread().cancel();
@@ -99,7 +113,8 @@ public class LiveDataFragment extends Fragment {
     private OnClickListener _onClickListener = new OnClickListener() {
         @Override
         public void onClick(final View view) {
-            _bluetoothController.reconnectToDevice();
+            _mainActivity.getFab().hide();
+            getActivity().getSupportFragmentManager().popBackStack();
         }
     };
 
@@ -121,6 +136,40 @@ public class LiveDataFragment extends Fragment {
         @Override
         public void onError(Throwable e) {
             e.printStackTrace();
+        }
+    };
+
+    private Observer<CONNECTION_STATUS> _statusObserver = new Observer<CONNECTION_STATUS>() {
+        @Override
+        public void onSubscribe(Disposable d) {
+            _statusDisposable = d;
+        }
+
+        @Override
+        public void onNext(CONNECTION_STATUS connection_status) {
+            FloatingActionButton fab = _mainActivity.getFab();
+
+            switch (connection_status) {
+                case DISCONNECTED:
+                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_add, null));
+                    fab.show();
+                    break;
+                case CONNECTING:
+                    _mainActivity.startProgressBar();
+                    fab.hide();
+                    break;
+                case CONNECTED:
+                    _mainActivity.stopProgressBar();
+                    break;
+            }
+        }
+
+        @Override
+        public void onComplete() {
+        }
+
+        @Override
+        public void onError(Throwable e) {
         }
     };
 }

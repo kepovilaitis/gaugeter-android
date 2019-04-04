@@ -9,7 +9,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextWatcher;
 import android.text.Editable;
 import android.view.View;
@@ -20,9 +19,7 @@ import android.widget.EditText;
 import android.widget.Button;
 
 import com.example.kestutis.cargauges.R;
-import com.example.kestutis.cargauges.activities.MainActivity;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
-import com.example.kestutis.cargauges.helpers.TouchCallbackHelper;
 import com.example.kestutis.cargauges.constants.Constants;
 import com.example.kestutis.cargauges.adapters.DeviceListAdapter;
 
@@ -30,7 +27,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class DevicesFragment extends Fragment {
-    private BluetoothController _bluetooth;
+    private BluetoothController _bluetoothController;
     private DeviceListAdapter _adapter;
 
     private List<BluetoothDevice> _devices = new ArrayList<>();
@@ -39,8 +36,8 @@ public class DevicesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-        _bluetooth = BluetoothController.getInstance();
-        _devices = _bluetooth.getBondedDevices();
+        _bluetoothController = BluetoothController.getInstance();
+        _devices = _bluetoothController.getBondedDevices();
     }
 
     @Override
@@ -55,11 +52,8 @@ public class DevicesFragment extends Fragment {
         searchButton.setOnClickListener(_searchListener);
         deviceList.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        _adapter = new DeviceListAdapter(_devices, ((MainActivity) getActivity()).getFab());
+        _adapter = new DeviceListAdapter(_devices);
         deviceList.setAdapter(_adapter);
-        ItemTouchHelper.Callback callback = new TouchCallbackHelper(_adapter.getItemTouchMoveListener());
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(deviceList);
 
         searchEditText.addTextChangedListener(_queryTextListener);
 
@@ -69,8 +63,8 @@ public class DevicesFragment extends Fragment {
     private OnClickListener _searchListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (_bluetooth.isBluetoothOn()) {
-                _bluetooth.startDiscovery();
+            if (_bluetoothController.isBluetoothOn()) {
+                _bluetoothController.startDiscovery();
 
                 Snackbar.make(v, "Bluetooth is On, Scanning", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();

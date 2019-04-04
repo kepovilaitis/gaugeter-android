@@ -8,9 +8,15 @@ import com.example.kestutis.cargauges.controllers.BluetoothController;
 public class CarGauges extends Application {
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+
+        BluetoothController.setInstance();
+    }
+
+    @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
-        BluetoothController.setInstance(base);
     }
 }
