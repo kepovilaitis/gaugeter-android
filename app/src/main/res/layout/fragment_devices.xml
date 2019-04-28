@@ -15,70 +15,71 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:focusableInTouchMode="true"
-            android:background="@drawable/search_bar"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
-            >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:focusableInTouchMode="true"
+                android:background="@drawable/search_bar"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp">
 
-            <ImageView
-                android:layout_width="0dp"
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_magnify_48dp"
+                    android:tint="@android:color/black"
+                    android:layout_gravity="center_vertical|end"/>
+
+                <EditText
+                    android:id="@id/search"
+                    android:layout_width="0dp"
+                    android:layout_weight="7"
+                    android:layout_height="match_parent"
+                    android:textCursorDrawable="@drawable/text_cursor"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_big"
+                    android:hint="@string/search"
+                    android:maxLines="1"
+                    android:background="@null"
+                    android:textColorHint="@android:color/black"/>
+
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@id/recyclerViewPairedDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:choiceMode="singleChoice"/>
+
+            <Button
+                android:id="@id/btnSearch"
+                android:background="@drawable/search_button"
+                android:layout_gravity="center"
+                android:layout_width="200dp"
                 android:layout_height="40dp"
-                android:layout_weight="1"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_magnify_48dp"
-                android:tint="@android:color/black"
-                android:layout_gravity="center_vertical|end"/>
-
-            <EditText
-                android:id="@id/search"
-                android:layout_width="0dp"
-                android:layout_weight="7"
-                android:layout_height="match_parent"
-                android:textCursorDrawable="@drawable/text_cursor"
+                android:text="@string/search_new_devices"
+                android:layout_margin="15dp"
                 android:textColor="@android:color/black"
-                android:textSize="@dimen/text_size_big"
-                android:hint="@string/search"
-                android:maxLines="1"
-                android:background="@null"
-                android:textColorHint="@android:color/black"/>
+                android:textSize="@dimen/text_size_default"
+                android:fontFamily="@assets/font/worksans_regular"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@id/recyclerViewFoundDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:choiceMode="singleChoice"/>
 
         </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@id/listViewPairedDevice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            android:choiceMode="singleChoice"/>
-
-        <Button
-            android:id="@id/btnSearch"
-            android:background="@drawable/search_button"
-            android:layout_gravity="center"
-            android:layout_width="200dp"
-            android:layout_height="40dp"
-            android:text="@string/search_new_devices"
-            android:layout_margin="15dp"
-            android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size_default"
-            android:fontFamily="@assets/font/worksans_regular"/>
-
-        <ListView
-            android:id="@id/listViewFoundDevice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
-
-    </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
 </RelativeLayout>

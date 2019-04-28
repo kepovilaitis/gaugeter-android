@@ -1,9 +1,13 @@
 package com.example.kestutis.cargauges.holders;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 public class LoginHolder {
-    public String _username;
-    public String _password;
+    private String _token;
+    private UserInfoHolder _user;
 }

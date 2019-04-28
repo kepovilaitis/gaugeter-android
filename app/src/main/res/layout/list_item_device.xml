@@ -49,14 +49,6 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@id/textStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:layout_marginTop="24dp"
-        android:textColor="@android:color/black" />
-
 </LinearLayout>
 
     <ProgressBar

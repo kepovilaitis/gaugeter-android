@@ -22,5 +22,10 @@ public class Constants {
 
     public static final String USER_ID = "user_id";
     public static final String LOGGED_IN = "logged_in";
-    public static final String TOKEN = "token";
+    public static final String USER_TOKEN = "user_token";
+
+    public static final int PERMISSION_FINE_LOCATION = 1;
+    public static final int PERMISSION_COARSE_LOCATION = 2;
+    public static final int PERMISSION_BLUETOOTH = 3;
+    public static final int PERMISSION_BLUETOOTH_ADMIN = 3;
 }

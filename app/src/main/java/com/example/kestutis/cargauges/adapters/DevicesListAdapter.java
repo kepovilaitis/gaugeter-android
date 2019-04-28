@@ -1,10 +1,11 @@
 package com.example.kestutis.cargauges.adapters;
 
-import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -18,20 +19,27 @@ import com.example.kestutis.cargauges.controllers.BluetoothController;
 import java.util.List;
 import java.util.ArrayList;
 
+import com.example.kestutis.cargauges.holders.DeviceInfoHolder;
+import com.example.kestutis.cargauges.network.BaseEmptyResponse;
+import com.example.kestutis.cargauges.network.GaugeterClient;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Response;
 
-public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.ViewHolder> implements Filterable {
-    private List<BluetoothDevice> _devices, filteredDevices;
-    private int _selectedPos = -1;
+public class DevicesListAdapter extends RecyclerView.Adapter<DevicesListAdapter.ViewHolder> implements Filterable {
+    private List<DeviceInfoHolder> _devices, _filteredDevices;
+    private int _selectedPosition = -1;
     private boolean _isClickable = true;
     private Disposable _statusDisposable;
+    private Context _context;
 
-    public DeviceListAdapter(List<BluetoothDevice> devices){
+    public DevicesListAdapter(List<DeviceInfoHolder> devices, Context context){
         _devices = devices;
-        filteredDevices = devices;
+        _filteredDevices = devices;
+        _context = context;
 
         BluetoothController.getInstance().getStateSubject()
                 .subscribeOn(Schedulers.io())
@@ -47,36 +55,24 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        BluetoothDevice device = filteredDevices.get(position);
+        DeviceInfoHolder device = _filteredDevices.get(position);
 
-        if(_selectedPos == position){
-            viewHolder.itemView.setSelected(true);
-            viewHolder.progressBar.setVisibility(View.VISIBLE);
-        } else {
-            viewHolder.itemView.setSelected(false);
-            viewHolder.progressBar.setVisibility(View.INVISIBLE);
-        }
-
+        viewHolder.itemView.setSelected(_selectedPosition == position);
+        viewHolder.progressBar.setVisibility(_selectedPosition == position ? View.VISIBLE : View.INVISIBLE);
         viewHolder.textName.setText(device.getName());
-        viewHolder.textAddress.setText(device.getAddress());
-        viewHolder.textStatus.setText(/*device.getBondState()*/"kantakt est");
+        viewHolder.textAddress.setText(device.getBluetoothAddress());
     }
 
     @Override
-    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
             _statusDisposable.dispose();
         }
     }
 
     @Override
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    @Override
     public int getItemCount() {
-        return filteredDevices.size();
+        return _devices.size();
     }
 
     @Override
@@ -85,7 +81,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
-                List<BluetoothDevice> deviceList = getDeviceList(constraint);
+                List<DeviceInfoHolder> deviceList = getDeviceList(constraint);
 
                 filterResults.values = deviceList;
                 filterResults.count = deviceList.size();
@@ -95,23 +91,23 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                filteredDevices = (List<BluetoothDevice>) results.values;
+                _filteredDevices = (List<DeviceInfoHolder>) results.values;
                 notifyDataSetChanged();
             }
         };
     }
 
-    private List<BluetoothDevice> getDeviceList(CharSequence input) {
-        List<BluetoothDevice> bondedDeviceList = _devices;
+    private List<DeviceInfoHolder> getDeviceList(CharSequence input) {
+        List<DeviceInfoHolder> bondedDeviceList = _devices;
 
         if (input == null || input.length() == 0) {
             return bondedDeviceList;
         }
 
-        List<BluetoothDevice> list = new ArrayList<>();
+        List<DeviceInfoHolder> list = new ArrayList<>();
         String filter = input.toString().toLowerCase();
 
-        for (BluetoothDevice item: bondedDeviceList) {
+        for (DeviceInfoHolder item: bondedDeviceList) {
             if (item.getName().toLowerCase().contains(filter)) {
                 list.add(item);
             }
@@ -120,13 +116,13 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
     }
 
     private void startProgress() {
-        notifyItemChanged(_selectedPos);
+        notifyItemChanged(_selectedPosition);
 
         _isClickable = false;
     }
 
     private void stopProgress() {
-        _selectedPos = -1;
+        _selectedPosition = -1;
         _isClickable = true;
 
         notifyDataSetChanged();
@@ -149,7 +145,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
 
         @Override
         public void onComplete() {
-
+            stopProgress();
         }
 
         @Override
@@ -161,7 +157,6 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
     class ViewHolder extends RecyclerView.ViewHolder {
         private TextView textName;
         private TextView textAddress;
-        private TextView textStatus;
         private ProgressBar progressBar;
 
         ViewHolder(final View itemView) {
@@ -169,7 +164,6 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
 
             textName = itemView.findViewById(R.id.textName);
             textAddress = itemView.findViewById(R.id.textAddress);
-            textStatus = itemView.findViewById(R.id.textStatus);
             progressBar = itemView.findViewById(R.id.progressBar);
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -179,12 +173,43 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
                     if (!_isClickable)
                         return;
 
-                    _selectedPos = getLayoutPosition();
+                    _selectedPosition = getLayoutPosition();
 
                     startProgress();
-                    BluetoothController.getInstance().connectToDevice(_devices.get(_selectedPos));
+                    BluetoothController.getInstance().connectToDevice(_devices.get(_selectedPosition).getBluetoothAddress());
                 }
             });
+
+            itemView.setOnLongClickListener(new OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int selectedPosition = getLayoutPosition();
+
+                    startProgress();
+
+                    GaugeterClient.getInstance()
+                            .removeDeviceFromUser(_devices.get(selectedPosition).getBluetoothAddress())
+                            .enqueue(new RemoveDeviceFromUserResponse(selectedPosition));
+
+                    return true;
+                }
+            });
+        }
+    }
+
+    private class RemoveDeviceFromUserResponse extends BaseEmptyResponse {
+        private int _selectedPos;
+
+        RemoveDeviceFromUserResponse(int selectedPosition) {
+            super(_context);
+            _selectedPos = selectedPosition;
+        }
+
+        @Override
+        public void onResponse(Call<Void> call, Response<Void> response) {
+            _devices.remove(_selectedPos);
+            notifyDataSetChanged();
+            stopProgress();
         }
     }
 }

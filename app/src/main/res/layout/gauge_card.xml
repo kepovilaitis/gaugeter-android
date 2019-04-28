@@ -22,7 +22,7 @@
         app:scaleStartValue="0"
         app:showScaleValues="true"
         app:showText="false"
-        app:subdivisions="4" />
+        app:subdivisions="4"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

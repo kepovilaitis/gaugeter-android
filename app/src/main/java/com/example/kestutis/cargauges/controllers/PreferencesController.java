@@ -52,14 +52,18 @@ public class PreferencesController extends PreferenceKeys {
     public void deleteSessionData() {
         Editor editor = _preferences.edit();
         editor.remove(Constants.USER_ID);
-        editor.remove(Constants.TOKEN);
+        editor.remove(Constants.USER_TOKEN);
         editor.remove(Constants.LOGGED_IN);
 
         editor.apply();
     }
 
     public String getUserId() {
-        return _preferences.getString(Constants.USER_ID, "user id");
+        return _preferences.getString(Constants.USER_ID, "userId");
+    }
+
+    public String getUserToken() {
+        return _preferences.getString(Constants.USER_TOKEN, "user_token");
     }
 
     public String getEditorValue(String key, String defaultValue) {

@@ -22,8 +22,8 @@
     <item type="id" name="textFullName" />
 
     <item type="id" name="listView" />
-    <item type="id" name="listViewPairedDevice"/>
-    <item type="id" name="listViewFoundDevice"/>
+    <item type="id" name="recyclerViewPairedDevices"/>
+    <item type="id" name="recyclerViewFoundDevices"/>
 
     <item type="id" name="gauge"/>
     <item type="id" name="gaugeOilTemp"/>

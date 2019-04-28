@@ -7,6 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class DeviceInfoHolder {
     private String _name;
-    private String _address;
-    private int _bondState;
+    private String _bluetoothAddress;
 }

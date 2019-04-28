@@ -1,11 +1,13 @@
 package com.example.kestutis.cargauges.activities;
 
+import android.Manifest.permission;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,6 +19,7 @@ import android.view.MenuItem;
 
 import android.view.View;
 import android.widget.TextView;
+import com.example.kestutis.cargauges.constants.Constants;
 import com.example.kestutis.cargauges.constants.Enums.CONNECTION_STATUS;
 import com.example.kestutis.cargauges.controllers.BluetoothController;
 import com.example.kestutis.cargauges.controllers.PreferencesController;
@@ -24,7 +27,8 @@ import com.example.kestutis.cargauges.fragments.DevicesFragment;
 
 import com.example.kestutis.cargauges.R;
 import com.example.kestutis.cargauges.fragments.LiveDataFragment_;
-import com.example.kestutis.cargauges.tools.SnackbarNotifier;
+import com.example.kestutis.cargauges.network.GaugeterClient;
+import com.example.kestutis.cargauges.tools.ToastNotifier;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -64,6 +68,11 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         super.onStart();
 
         _isActive = true;
+
+//        ActivityCompat.requestPermissions(this, new String[]{ permission.ACCESS_FINE_LOCATION}, Constants.PERMISSION_FINE_LOCATION);
+        ActivityCompat.requestPermissions(this, new String[]{ permission.ACCESS_COARSE_LOCATION}, Constants.PERMISSION_COARSE_LOCATION);
+//        ActivityCompat.requestPermissions(this, new String[]{ permission.BLUETOOTH_ADMIN}, Constants.PERMISSION_BLUETOOTH_ADMIN);
+//        ActivityCompat.requestPermissions(this, new String[]{ permission.BLUETOOTH}, Constants.PERMISSION_BLUETOOTH);
     }
 
     @Override
@@ -127,7 +136,9 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
         switch (item.getItemId()){
             case R.id.menuLogout:
+
                 new PreferencesController(getApplicationContext()).deleteSessionData();
+                GaugeterClient.getInstance().logout();
 
                 if (isActive()) {
                     Intent i = new Intent(this, LoginActivity.class);
@@ -191,10 +202,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         return false;
     }
 
-    private void showSnackbar(int message) {
-        SnackbarNotifier.showMessage(findViewById(R.id.mainContent), message);
-    }
-
     private Observer<CONNECTION_STATUS> _statusObserver = new Observer<CONNECTION_STATUS>() {
         @Override
         public void onSubscribe(Disposable d) {
@@ -205,7 +212,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         public void onNext(CONNECTION_STATUS connection_status) {
             switch (connection_status) {
                 case DISCONNECTED:
-                    showSnackbar(R.string.message_connection_closed);
+                    ToastNotifier.showBluetoothError(MainActivity.this, R.string.message_connection_closed);
 
                     break;
                 case CONNECTED:

@@ -161,11 +161,11 @@ public class LiveDataFragment extends Fragment {
                     fab.show();
                     break;
                 case CONNECTING:
-                    _mainActivity.startProgressBar();
+                    _mainActivity.startProgress();
                     fab.hide();
                     break;
                 case CONNECTED:
-                    _mainActivity.stopProgressBar();
+                    _mainActivity.stopProgress();
                     break;
             }
         }

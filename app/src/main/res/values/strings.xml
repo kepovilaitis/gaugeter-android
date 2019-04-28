@@ -40,7 +40,9 @@
 
     <string name="message_connection_closed">Connection to device closed!</string>
 
-    <string name="error_bad_credentials">Wrong username or password.</string>
-    <string name="error_internal_server">Server error</string>
+    <string name="error_http_bad_credentials">Wrong username or password.</string>
+    <string name="error_http_internal_server">Server error</string>
+
+    <string name="error_bluetooth">Bluetooth error occurred</string>
 
 </resources>

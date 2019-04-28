@@ -8,12 +8,12 @@ import android.widget.FrameLayout;
 public abstract class BaseActivity extends AppCompatActivity {
     FrameLayout _progressBar;
 
-    public void startProgressBar() {
+    public void startProgress() {
         _progressBar.setVisibility(View.VISIBLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
-    public void stopProgressBar() {
+    public void stopProgress() {
         _progressBar.setVisibility(View.GONE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
