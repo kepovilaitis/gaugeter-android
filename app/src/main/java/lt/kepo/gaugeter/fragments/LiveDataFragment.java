@@ -2,13 +2,13 @@ package lt.kepo.gaugeter.fragments;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.View.OnClickListener;
 
 import lt.kepo.gaugeter.R;
 import lt.kepo.gaugeter.activities.MainActivity;
 import lt.kepo.gaugeter.constants.Enums.CONNECTION_STATUS;
+import lt.kepo.gaugeter.holders.DeviceInfoHolder;
 import lt.kepo.gaugeter.holders.LiveDataHolder;
 import lt.kepo.gaugeter.constants.PreferenceKeys;
 import lt.kepo.gaugeter.controllers.BluetoothController;
@@ -24,7 +24,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_gauges)
-public class LiveDataFragment extends Fragment {
+public class LiveDataFragment extends BaseFragment {
 
     @ViewById(R.id.gaugeOilTemp) GaugeCardView_ _oilTempGaugeCard;
     @ViewById(R.id.gaugeOilPressure) GaugeCardView_ _oilPressureGaugeCard;
@@ -35,28 +35,31 @@ public class LiveDataFragment extends Fragment {
     private PreferencesController _preferences;
     private Disposable _liveDataDisposable;
     private Disposable _statusDisposable;
-    private MainActivity _mainActivity;
+    private DeviceInfoHolder _device;
+    private FloatingActionButton _fab;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        BluetoothController.getInstance().getLiveDataSubject()
+        _bluetoothController = BluetoothController.getInstance();
+
+        _bluetoothController.getLiveDataSubject()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(_liveDataObserver);
 
-        BluetoothController.getInstance().getStateSubject()
+        _bluetoothController.getStateSubject()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(_statusObserver);
+
+        _device = _bluetoothController.getDevice();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
-        _bluetoothController = BluetoothController.getInstance();
 
         switch (_preferences.getEditorValue(PreferenceKeys.PREFERENCE_MEASUREMENT_SYSTEM, "Metric")){
             case "Metric":
@@ -79,11 +82,13 @@ public class LiveDataFragment extends Fragment {
     @AfterViews
     void setUpViews(){
 
-        _mainActivity = (MainActivity) getActivity();
+        MainActivity mainActivity = (MainActivity) getActivity();
 
-        if (_mainActivity != null){
-            _mainActivity.setTitle(getString(R.string.live_data));
-            _mainActivity.getFab().setOnClickListener(_onClickListener);
+        if (mainActivity != null && mainActivity.isActive() ){
+            mainActivity.setTitle(_device.getName());
+
+            _fab = mainActivity.getFab();
+            _fab.setOnClickListener(_fabClickListener);
         }
 
         _preferences = new PreferencesController(getContext());
@@ -96,13 +101,16 @@ public class LiveDataFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if (_liveDataDisposable != null && !_liveDataDisposable.isDisposed()) {
-            _liveDataDisposable.dispose();
-        }
+//        if (_liveDataDisposable != null && !_liveDataDisposable.isDisposed()) {
+//            _liveDataDisposable.dispose();
+//        }
 
-        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
-            _statusDisposable.dispose();
-        }
+        _liveDataObserver.onComplete();
+        _statusObserver.onComplete();
+
+//        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
+//            _statusDisposable.dispose();
+//        }
 
         _bluetoothController.getLiveDataThread().cancel();
 
@@ -110,19 +118,13 @@ public class LiveDataFragment extends Fragment {
     }
 
     private void update(LiveDataHolder data) {
-        _oilPressureGaugeCard.setValue(data.getOilPressure());
-        _oilTempGaugeCard.setValue(data.getOilPressure());
-        _waterTempGaugeCard.setValue(data.getWaterTemperature());
-        _chargeGaugeCard.setValue(data.getCharge());
-    }
-
-    private OnClickListener _onClickListener = new OnClickListener() {
-        @Override
-        public void onClick(final View view) {
-            _mainActivity.getFab().hide();
-            getActivity().getSupportFragmentManager().popBackStack();
+        if (isAdded()) {
+            _oilPressureGaugeCard.setValue(data.getOilPressure());
+            _oilTempGaugeCard.setValue(data.getOilPressure());
+            _waterTempGaugeCard.setValue(data.getWaterTemperature());
+            _chargeGaugeCard.setValue(data.getCharge());
         }
-    };
+    }
 
     private Observer<LiveDataHolder> _liveDataObserver = new Observer<LiveDataHolder>() {
         @Override
@@ -153,19 +155,17 @@ public class LiveDataFragment extends Fragment {
 
         @Override
         public void onNext(CONNECTION_STATUS connection_status) {
-            FloatingActionButton fab = _mainActivity.getFab();
-
             switch (connection_status) {
                 case DISCONNECTED:
-                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_add, null));
-                    fab.show();
+                    _fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_refresh, null));
+                    _fab.show();
                     break;
                 case CONNECTING:
-                    _mainActivity.startProgress();
-                    fab.hide();
+                    startProgress();
+                    _fab.hide();
                     break;
                 case CONNECTED:
-                    _mainActivity.stopProgress();
+                    stopProgress();
                     break;
             }
         }
@@ -176,6 +176,15 @@ public class LiveDataFragment extends Fragment {
 
         @Override
         public void onError(Throwable e) {
+        }
+    };
+
+    private OnClickListener _fabClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            startProgress();
+            _fab.hide();
+            _bluetoothController.reconnectToDevice();
         }
     };
 }

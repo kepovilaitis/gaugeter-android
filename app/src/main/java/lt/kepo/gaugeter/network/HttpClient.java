@@ -11,7 +11,6 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -21,16 +20,18 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public class GaugeterClient {
+public class HttpClient {
     private static final String GAUGETER_BASE_URL = "https://kepo.lt";
     @Setter @Getter private String _userToken = "";
 
-    @Getter private static GaugeterClient _instance;
+    @Getter private static HttpClient _instance;
 
-    private GaugeterService _gaugeterService;
+    private HttpService _httpService;
 
-    private GaugeterClient() {
-        final Gson gson = new GsonBuilder().setFieldNamingStrategy(_namingPolicy).create();
+    private HttpClient() {
+        final Gson gson = new GsonBuilder()
+                .setFieldNamingStrategy(_namingPolicy)
+                .create();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(GAUGETER_BASE_URL)
@@ -39,31 +40,31 @@ public class GaugeterClient {
                 .client(new OkHttpClient.Builder().addInterceptor(_okHttpClientInterceptor).build())
                 .build();
 
-        _gaugeterService = retrofit.create(GaugeterService.class);
+        _httpService = retrofit.create(HttpService.class);
     }
 
     public static void setInstance() {
-        _instance = new GaugeterClient();
+        _instance = new HttpClient();
     }
 
     public Single<LoginHolder> login(LoginHolder loginHolder) {
-        return _gaugeterService.login(loginHolder);
+        return _httpService.login(loginHolder);
     }
 
     public void logout() {
         _userToken = "";
     }
 
-    public Call<Void> addDeviceToUser(DeviceInfoHolder device) {
-        return _gaugeterService.addDeviceToUser(device);
+    public Single<List<DeviceInfoHolder>> addDeviceToUser(DeviceInfoHolder device) {
+        return _httpService.addDeviceToUser(device);
     }
 
     public Single<List<DeviceInfoHolder>> getUserDevices() {
-            return _gaugeterService.getUserDevices();
+            return _httpService.getUserDevices();
     }
 
-    public Call<Void> removeDeviceFromUser(String bluetoothAddress) {
-            return _gaugeterService.removeDeviceFromUser(bluetoothAddress);
+    public Single<List<DeviceInfoHolder>> removeDeviceFromUser(String bluetoothAddress) {
+            return _httpService.removeDeviceFromUser(bluetoothAddress);
     }
 
     private FieldNamingStrategy _namingPolicy = new FieldNamingStrategy() {

@@ -12,7 +12,7 @@ import lt.kepo.gaugeter.helpers.KeyboardHelper;
 import lt.kepo.gaugeter.holders.LoginHolder;
 import lt.kepo.gaugeter.holders.UserInfoHolder;
 import lt.kepo.gaugeter.network.BaseResponse;
-import lt.kepo.gaugeter.network.GaugeterClient;
+import lt.kepo.gaugeter.network.HttpClient;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -30,7 +30,7 @@ public class LoginActivity extends BaseActivity {
         _preferencesController = new PreferencesController(getApplicationContext());
 
         if (_preferencesController.getIsLoggedIn()) {
-            GaugeterClient.getInstance().setUserToken(_preferencesController.getUserToken());
+            HttpClient.getInstance().setUserToken(_preferencesController.getUserToken());
             startMainActivity();
         } else {
             setContentView(R.layout.activity_login);
@@ -52,7 +52,7 @@ public class LoginActivity extends BaseActivity {
     private void login(LoginHolder loginHolder) {
         KeyboardHelper.hideKeyboard(this);
 
-        GaugeterClient.getInstance()
+        HttpClient.getInstance()
                 .login(loginHolder)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -90,8 +90,7 @@ public class LoginActivity extends BaseActivity {
             _preferencesController.setEditorValue(Constants.USER_ID, loginHolder.getUser().getUserId());
             _preferencesController.setEditorValue(Constants.USER_TOKEN, loginHolder.getToken());
 
-            GaugeterClient.getInstance().setUserToken(loginHolder.getToken());
-
+            HttpClient.getInstance().setUserToken(loginHolder.getToken());
             stopProgress();
             startMainActivity();
         }

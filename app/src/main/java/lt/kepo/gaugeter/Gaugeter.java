@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import lt.kepo.gaugeter.controllers.BluetoothController;
-import lt.kepo.gaugeter.network.GaugeterClient;
+import lt.kepo.gaugeter.network.HttpClient;
 
 public class Gaugeter extends Application {
 
@@ -13,7 +13,7 @@ public class Gaugeter extends Application {
         super.onCreate();
 
         BluetoothController.setInstance();
-        GaugeterClient.setInstance();
+        HttpClient.setInstance();
     }
 
     @Override

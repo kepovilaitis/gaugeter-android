@@ -9,7 +9,6 @@ public class Enums {
 
     public enum CONNECTION_STATUS {
         CONNECTING,
-        FAILED_CONNECTING,
         CONNECTED,
         DISCONNECTED
     }

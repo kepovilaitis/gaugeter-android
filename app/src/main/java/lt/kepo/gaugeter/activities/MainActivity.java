@@ -1,7 +1,9 @@
 package lt.kepo.gaugeter.activities;
 
 import android.Manifest.permission;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -9,6 +11,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -26,9 +29,7 @@ import lt.kepo.gaugeter.controllers.BluetoothController;
 import lt.kepo.gaugeter.controllers.PreferencesController;
 import lt.kepo.gaugeter.fragments.DevicesFragment;
 
-import lt.kepo.gaugeter.fragments.LiveDataFragment_;
-import lt.kepo.gaugeter.network.GaugeterClient;
-import lt.kepo.gaugeter.tools.ToastNotifier;
+import lt.kepo.gaugeter.network.HttpClient;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -37,11 +38,13 @@ import lombok.Getter;
 
 public class MainActivity extends BaseActivity implements OnNavigationItemSelectedListener {
     @Getter FloatingActionButton _fab;
+
     @Getter private boolean _isActive = false;
 
     private DrawerLayout _menuLayout;
     private ActionBarDrawerToggle _menuToggle;
     private Disposable _statusDisposable;
+    private BluetoothController _bluetoothController = BluetoothController.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +60,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         fragmentTransaction.add(R.id.mainContent, new DevicesFragment());
         fragmentTransaction.commit();
 
-        BluetoothController.getInstance().getStateSubject()
+        _bluetoothController.getStateSubject()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(_statusObserver);
@@ -69,18 +72,22 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
         _isActive = true;
 
-//        ActivityCompat.requestPermissions(this, new String[]{ permission.ACCESS_FINE_LOCATION}, Constants.PERMISSION_FINE_LOCATION);
-        ActivityCompat.requestPermissions(this, new String[]{ permission.ACCESS_COARSE_LOCATION}, Constants.PERMISSION_COARSE_LOCATION);
-//        ActivityCompat.requestPermissions(this, new String[]{ permission.BLUETOOTH_ADMIN}, Constants.PERMISSION_BLUETOOTH_ADMIN);
-//        ActivityCompat.requestPermissions(this, new String[]{ permission.BLUETOOTH}, Constants.PERMISSION_BLUETOOTH);
+        if (ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{ permission.ACCESS_COARSE_LOCATION}, Constants.PERMISSION_COARSE_LOCATION);
+        }
+
+        if (ContextCompat.checkSelfPermission(this, permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{ permission.BLUETOOTH_ADMIN}, Constants.PERMISSION_BLUETOOTH_ADMIN);
+        }
+
+        if (!_bluetoothController.isBluetoothOn()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, Constants.REQUEST_ENABLE_BT);
+        }
     }
 
     @Override
     protected void onStop() {
-        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
-            _statusDisposable.dispose();
-        }
-
         _isActive = false;
 
         super.onStop();
@@ -138,7 +145,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             case R.id.menuLogout:
 
                 new PreferencesController(getApplicationContext()).deleteSessionData();
-                GaugeterClient.getInstance().logout();
+                HttpClient.getInstance().logout();
 
                 if (isActive()) {
                     Intent i = new Intent(this, LoginActivity.class);
@@ -212,15 +219,15 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         public void onNext(CONNECTION_STATUS connection_status) {
             switch (connection_status) {
                 case DISCONNECTED:
-                    ToastNotifier.showBluetoothError(MainActivity.this, R.string.message_connection_closed);
+//                    ToastNotifier.showBluetoothError(MainActivity.this, R.string.message_connection_closed);
 
                     break;
                 case CONNECTED:
 
-                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.mainContent, new LiveDataFragment_());
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
+//                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//                    fragmentTransaction.replace(R.id.mainContent, new LiveDataFragment_());
+//                    fragmentTransaction.addToBackStack(null);
+//                    fragmentTransaction.commit();
 
                     break;
             }
