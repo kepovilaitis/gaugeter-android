@@ -9,7 +9,7 @@
     android:layout_margin="10dp"
     android:paddingBottom="5dp">
 
-    <com.example.kestutis.cargauges.views.GaugeView
+    <lt.kepo.gaugeter.views.GaugeView
         android:id="@id/gaugeView"
         android:layout_width="360dp"
         android:layout_height="240dp"
