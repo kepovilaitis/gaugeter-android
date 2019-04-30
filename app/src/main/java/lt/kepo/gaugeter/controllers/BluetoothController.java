@@ -28,10 +28,11 @@ public class BluetoothController {
     private static final String HC_05_DEFAULT_NAME = "HC-05";
 
     @Getter private static BluetoothController _instance;
-    @Getter private PublishSubject<CONNECTION_STATUS> _stateSubject = PublishSubject.create();
-    @Getter private PublishSubject<LiveDataHolder> _liveDataSubject;
     @Getter private ReadLiveDataThread _liveDataThread;
     @Getter @Setter DeviceInfoHolder _device;
+
+    @Getter private PublishSubject<CONNECTION_STATUS> _stateSubject = PublishSubject.create();
+    @Getter private PublishSubject<LiveDataHolder> _liveDataSubject;
 
     private static BluetoothAdapter _adapter;
 
@@ -251,6 +252,7 @@ public class BluetoothController {
                                 )
                             );
                         } else {
+                            _liveDataSubject.onError(new Throwable());
                             Log.d("Incorrect", " checksum!");
                             return;
                         }
@@ -259,6 +261,7 @@ public class BluetoothController {
                     e.printStackTrace();
                     cancel();
 
+                    _liveDataSubject.onError(new Throwable());
                     _stateSubject.onNext(CONNECTION_STATUS.DISCONNECTED);
                 }
             }

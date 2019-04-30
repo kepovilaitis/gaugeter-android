@@ -5,7 +5,7 @@
 
     <item
         android:id="@id/menuAccountSettings"
-        android:icon="@drawable/account"
+        android:icon="@drawable/ic_account"
         android:title="@string/account"
         app:showAsAction="ifRoom"/>
 
@@ -17,7 +17,7 @@
 
     <item
         android:id="@id/menuLogout"
-        android:icon="@drawable/account"
+        android:icon="@drawable/ic_account"
         android:title="@string/logout"
         app:showAsAction="always"/>
 

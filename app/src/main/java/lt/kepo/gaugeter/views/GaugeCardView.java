@@ -25,6 +25,7 @@ import java.util.Locale;
 
 @EViewGroup(R.layout.gauge_card)
 public class GaugeCardView extends LinearLayout {
+
     @ViewById(R.id.gaugeView) GaugeView _gaugeView;
     @ViewById(R.id.gaugeText) TextView _gaugeText;
     @ViewById(R.id.value) TextView _value;
@@ -32,6 +33,7 @@ public class GaugeCardView extends LinearLayout {
     @ViewById(R.id.gaugeChart) LineChart _gaugeChart;
 
     private LineData _lineData;
+    private boolean _isChartVisible = false;
 
     public GaugeCardView(Context context) {
         super(context);
@@ -61,13 +63,15 @@ public class GaugeCardView extends LinearLayout {
 
     @Click({R.id.btnExpand})
     void onClick(View view) {
-        if (_gaugeChart.getVisibility() != View.GONE) {
+        if (_isChartVisible) {
             view.startAnimation(AnimationHelper.getRotateToAngle(45.0f, 0.0f));
 
+            _isChartVisible = false;
             _gaugeChart.setVisibility(View.GONE);
         } else {
             view.startAnimation(AnimationHelper.getRotateToAngle(0.0f, 45.0f));
 
+            _isChartVisible = true;
             _gaugeChart.setVisibility(View.VISIBLE);
         }
     }

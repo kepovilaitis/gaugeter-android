@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import lt.kepo.gaugeter.holders.WorkHolder;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -66,6 +67,10 @@ public class HttpClient {
 
     public Call<Void> removeDeviceFromUser(String bluetoothAddress) {
             return _httpService.removeDeviceFromUser(bluetoothAddress);
+    }
+
+    public Single<Integer> upsertWork(WorkHolder workHolder) {
+            return _httpService.upsertWork(workHolder);
     }
 
     private FieldNamingStrategy _namingPolicy = new FieldNamingStrategy() {

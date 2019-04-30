@@ -23,6 +23,8 @@ public class LoginActivity extends BaseActivity {
     private EditText _password;
     private PreferencesController _preferencesController;
 
+    private HttpClient _httpClient = HttpClient.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +32,8 @@ public class LoginActivity extends BaseActivity {
         _preferencesController = new PreferencesController(getApplicationContext());
 
         if (_preferencesController.getIsLoggedIn()) {
-            HttpClient.getInstance().setUserToken(_preferencesController.getUserToken());
+            _httpClient.setUserToken(_preferencesController.getUserToken());
+
             startMainActivity();
         } else {
             setContentView(R.layout.activity_login);
@@ -52,7 +55,7 @@ public class LoginActivity extends BaseActivity {
     private void login(LoginHolder loginHolder) {
         KeyboardHelper.hideKeyboard(this);
 
-        HttpClient.getInstance()
+        _httpClient
                 .login(loginHolder)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -90,7 +93,7 @@ public class LoginActivity extends BaseActivity {
             _preferencesController.setEditorValue(Constants.USER_ID, loginHolder.getUser().getUserId());
             _preferencesController.setEditorValue(Constants.USER_TOKEN, loginHolder.getToken());
 
-            HttpClient.getInstance().setUserToken(loginHolder.getToken());
+            _httpClient.setUserToken(loginHolder.getToken());
             stopProgress();
             startMainActivity();
         }

@@ -51,5 +51,7 @@
     <item type="id" name="editPassword"/>
 
     <item type="id" name="menuLogout"/>
+    <item type="id" name="menuDeviceSettings"/>
+    <item type="id" name="menuComplete"/>
 
 </resources>

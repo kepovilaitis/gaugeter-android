@@ -3,6 +3,7 @@ package lt.kepo.gaugeter.network;
 import lt.kepo.gaugeter.holders.DeviceInfoHolder;
 import lt.kepo.gaugeter.holders.LoginHolder;
 import io.reactivex.Single;
+import lt.kepo.gaugeter.holders.WorkHolder;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -22,4 +23,8 @@ public interface HttpService {
 
     @DELETE("/api/devices/Remove")
     Call<Void> removeDeviceFromUser(@Query("bluetoothAddress") String bluetoothAddress);
+
+    @Headers({"Content-Type: application/json"})
+    @POST("/work")
+    Single<Integer> upsertWork(@Body WorkHolder workHolder);
 }

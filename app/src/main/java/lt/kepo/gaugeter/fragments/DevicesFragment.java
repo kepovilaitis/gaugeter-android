@@ -206,6 +206,7 @@ public class DevicesFragment extends BaseFragment {
         @Override
         public void onError(Throwable e) {
             stopProgress();
+            _foundDevicesAdapter.stopProgress();
 
             super.onError(e);
         }
@@ -237,14 +238,14 @@ public class DevicesFragment extends BaseFragment {
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onComplete() {
             stopProgress();
-            ToastNotifier.showBluetoothError(_context, R.string.error_bluetooth);
         }
 
         @Override
-        public void onComplete() {
+        public void onError(Throwable e) {
             stopProgress();
+            ToastNotifier.showBluetoothError(_context, R.string.error_bluetooth);
         }
     }
 
