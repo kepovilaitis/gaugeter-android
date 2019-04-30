@@ -1,5 +1,6 @@
 package lt.kepo.gaugeter.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
@@ -14,6 +15,7 @@ import lt.kepo.gaugeter.constants.PreferenceKeys;
 import lt.kepo.gaugeter.controllers.BluetoothController;
 import lt.kepo.gaugeter.controllers.PreferencesController;
 
+import lt.kepo.gaugeter.tools.ToastNotifier;
 import lt.kepo.gaugeter.views.GaugeCardView_;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -37,12 +39,20 @@ public class LiveDataFragment extends BaseFragment {
     private Disposable _statusDisposable;
     private DeviceInfoHolder _device;
     private FloatingActionButton _fab;
+    private Context _context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         _bluetoothController = BluetoothController.getInstance();
+        _device = _bluetoothController.getDevice();
+        _context = getContext();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         _bluetoothController.getLiveDataSubject()
                 .subscribeOn(Schedulers.io())
@@ -53,13 +63,6 @@ public class LiveDataFragment extends BaseFragment {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(_statusObserver);
-
-        _device = _bluetoothController.getDevice();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
 
         switch (_preferences.getEditorValue(PreferenceKeys.PREFERENCE_MEASUREMENT_SYSTEM, "Metric")){
             case "Metric":
@@ -91,7 +94,7 @@ public class LiveDataFragment extends BaseFragment {
             _fab.setOnClickListener(_fabClickListener);
         }
 
-        _preferences = new PreferencesController(getContext());
+        _preferences = new PreferencesController(_context);
 
         _oilPressureGaugeCard.setText(R.string.text_oil_pressure);
         _oilTempGaugeCard.setText(R.string.text_oil_temp);
@@ -100,21 +103,18 @@ public class LiveDataFragment extends BaseFragment {
     }
 
     @Override
-    public void onDestroy() {
-//        if (_liveDataDisposable != null && !_liveDataDisposable.isDisposed()) {
-//            _liveDataDisposable.dispose();
-//        }
+    public void onStop() {
+        if (_liveDataDisposable != null && !_liveDataDisposable.isDisposed()) {
+            _liveDataDisposable.dispose();
+        }
 
-        _liveDataObserver.onComplete();
-        _statusObserver.onComplete();
-
-//        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
-//            _statusDisposable.dispose();
-//        }
+        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
+            _statusDisposable.dispose();
+        }
 
         _bluetoothController.getLiveDataThread().cancel();
 
-        super.onDestroy();
+        super.onStop();
     }
 
     private void update(LiveDataHolder data) {
@@ -157,6 +157,8 @@ public class LiveDataFragment extends BaseFragment {
         public void onNext(CONNECTION_STATUS connection_status) {
             switch (connection_status) {
                 case DISCONNECTED:
+                    stopProgress();
+                    ToastNotifier.showBluetoothError(_context, R.string.message_connection_closed);
                     _fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_refresh, null));
                     _fab.show();
                     break;

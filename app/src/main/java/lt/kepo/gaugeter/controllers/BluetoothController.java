@@ -12,7 +12,6 @@ import android.util.Log;
 import java.io.*;
 
 import io.reactivex.*;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import lombok.*;
@@ -30,7 +29,7 @@ public class BluetoothController {
 
     @Getter private static BluetoothController _instance;
     @Getter private PublishSubject<CONNECTION_STATUS> _stateSubject = PublishSubject.create();
-    @Getter private PublishSubject<LiveDataHolder> _liveDataSubject = PublishSubject.create();
+    @Getter private PublishSubject<LiveDataHolder> _liveDataSubject;
     @Getter private ReadLiveDataThread _liveDataThread;
     @Getter @Setter DeviceInfoHolder _device;
 
@@ -78,22 +77,26 @@ public class BluetoothController {
 
         context.registerReceiver(new BondWithDeviceReceiver(device, observer), filter);
 
-        Single.create(new SingleOnSubscribe<String>() {
-                    @Override
-                    public void subscribe(SingleEmitter<String> emitter){
-                        device.createBond();
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(observer);
+        if (observer != null){
+            Single.create(new SingleOnSubscribe<String>() {
+                        @Override
+                        public void subscribe(SingleEmitter<String> emitter){
+                            device.createBond();
+                        }
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io())
+                    .subscribe(observer);
+        } else {
+            device.createBond();
+        }
     }
 
-    public void connectToDevice(Context context, String bluetoothAddress){
+    public void connectToDevice(Context context, String bluetoothAddress, SingleObserver<String> observer){
         BluetoothDevice device = _adapter.getRemoteDevice(bluetoothAddress);
 
         if (context != null && !(device.getBondState() == BluetoothDevice.BOND_BONDED)) {
-            bondWithDevice(context, bluetoothAddress, new BondWithExistingDeviceObserver());
+            bondWithDevice(context, bluetoothAddress, observer);
         } else {
             connectToDevice(device);
         }
@@ -106,6 +109,16 @@ public class BluetoothController {
 
     public void reconnectToDevice() {
         connectToDevice(_adapter.getRemoteDevice(_device.getBluetoothAddress()));
+    }
+
+    public void removeBondedDevice(String bluetoothAddress) {
+        try {
+            BluetoothDevice device = _adapter.getRemoteDevice(bluetoothAddress);
+
+            device.getClass()
+                    .getMethod("removeBond", (Class[]) null)
+                    .invoke(device, (Object[]) null);
+        } catch (Exception ignore) { }
     }
 
     @AllArgsConstructor
@@ -158,32 +171,24 @@ public class BluetoothController {
                 }
 
             } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
-                if (_device.getBondState() == BluetoothDevice.BOND_BONDED) {
-                    _observer.onSuccess(_device.getAddress());
+                int deviceBondState = _device.getBondState();
 
-                    context.unregisterReceiver(this);
+                if (_observer != null) {
+                    if (deviceBondState == BluetoothDevice.BOND_BONDED) {
+                        context.unregisterReceiver(this);
 
-                } else if (!(_device.getBondState() == BluetoothDevice.BOND_BONDED && _device.getBondState() == BluetoothDevice.BOND_BONDING)){
-                    _observer.onError(null);
+                        _observer.onSuccess(_device.getAddress());
+                    } else if (deviceBondState == BluetoothDevice.BOND_NONE){
+
+                        _observer.onError(null);
+                    }
+                } else {
+                    if (deviceBondState == BluetoothDevice.BOND_BONDED) {
+                        context.unregisterReceiver(this);
+                        connectToDevice(_device);
+                    }
                 }
             }
-        }
-    }
-
-    private class BondWithExistingDeviceObserver implements SingleObserver<String> {
-        @Override
-        public void onSubscribe(Disposable d) {
-
-        }
-
-        @Override
-        public void onSuccess(String bluetoothAddress) {
-            connectToDevice(_adapter.getRemoteDevice(bluetoothAddress));
-        }
-
-        @Override
-        public void onError(Throwable e) {
-            _stateSubject.onNext(CONNECTION_STATUS.DISCONNECTED);
         }
     }
 
@@ -216,6 +221,7 @@ public class BluetoothController {
                 try {
                     _socket.getOutputStream().write(0);
                     _stateSubject.onNext(CONNECTION_STATUS.CONNECTED);
+                    _liveDataSubject = PublishSubject.create();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

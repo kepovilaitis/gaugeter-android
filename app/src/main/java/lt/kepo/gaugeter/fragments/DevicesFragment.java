@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 
 import io.reactivex.SingleObserver;
+import lombok.AllArgsConstructor;
 import lt.kepo.gaugeter.R;
 import lt.kepo.gaugeter.adapters.FoundDevicesAdapter;
 import lt.kepo.gaugeter.constants.Enums.CONNECTION_STATUS;
@@ -51,6 +52,7 @@ public class DevicesFragment extends BaseFragment {
 
         _context = getContext();
         _bluetoothController = BluetoothController.getInstance();
+        _bluetoothController.setDevice(null);
     }
 
     @Override
@@ -64,7 +66,7 @@ public class DevicesFragment extends BaseFragment {
         RecyclerView foundDevicesList = main.findViewById(R.id.recyclerViewFoundDevices);
 
         devicesList.setLayoutManager(new LinearLayoutManager(_context));
-        _devicesListAdapter = new DevicesListAdapter(_devices, _devices, _context, new GetDeviceListResponse(_context), _connectToDeviceAction);
+        _devicesListAdapter = new DevicesListAdapter(_devices, _context, _connectToDeviceAction);
         devicesList.setAdapter(_devicesListAdapter);
 
         foundDevicesList.setLayoutManager(new LinearLayoutManager(_context));
@@ -79,22 +81,27 @@ public class DevicesFragment extends BaseFragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new GetDeviceListResponse(_context));
 
+        return main;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
         _bluetoothController
                 .getStateSubject()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(_statusObserver);
-
-        return main;
     }
 
     @Override
-    public void onDestroy() {
+    public void onStop() {
         if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
             _statusDisposable.dispose();
         }
 
-        super.onDestroy();
+        super.onStop();
     }
 
     private OnClickListener _discoverDevicesClickListener = new OnClickListener() {
@@ -107,17 +114,15 @@ public class DevicesFragment extends BaseFragment {
     private OnDeviceAction _connectToDeviceAction = new OnDeviceAction() {
         @Override
         public void execute(DeviceInfoHolder device) {
-            startProgress();
             _bluetoothController.setDevice(device);
-            _bluetoothController.connectToDevice(_context, device.getBluetoothAddress());
+            _bluetoothController.connectToDevice(_context, device.getBluetoothAddress(), null);
         }
     };
 
     private OnDeviceAction _bondWithDeviceAction = new OnDeviceAction() {
         @Override
         public void execute(DeviceInfoHolder device) {
-            startProgress();
-            _bluetoothController.bondWithDevice(_context, device.getBluetoothAddress(), new BondWithNewDeviceObserver());
+            _bluetoothController.bondWithDevice(_context, device.getBluetoothAddress(), new BondWithNewDeviceObserver(device));
         }
     };
 
@@ -137,7 +142,6 @@ public class DevicesFragment extends BaseFragment {
     private Observer<CONNECTION_STATUS> _statusObserver = new Observer<CONNECTION_STATUS>() {
         @Override
         public void onSubscribe(Disposable d) {
-            startProgress();
             _statusDisposable = d;
         }
 
@@ -146,6 +150,7 @@ public class DevicesFragment extends BaseFragment {
             switch (connection_status) {
                 case DISCONNECTED:
                     stopProgress();
+                    _devicesListAdapter.stopProgress();
                     ToastNotifier.showBluetoothError(_context, R.string.message_connection_closed);
 
                     break;
@@ -160,7 +165,7 @@ public class DevicesFragment extends BaseFragment {
                         fragmentTransaction.commit();
                     }
 
-                    stopProgress();
+                    _devicesListAdapter.stopProgress();
 
                     break;
             }
@@ -191,6 +196,7 @@ public class DevicesFragment extends BaseFragment {
         @Override
         public void onSuccess(List<DeviceInfoHolder> devices) {
             stopProgress();
+            _foundDevicesAdapter.stopProgress();
 
             _devices.clear();
             _devices.addAll(devices);
@@ -216,8 +222,18 @@ public class DevicesFragment extends BaseFragment {
 
         @Override
         public void onNext(DeviceInfoHolder deviceInfoHolder) {
-            _foundDevices.add(deviceInfoHolder);
-            _foundDevicesAdapter.notifyDataSetChanged();
+            boolean shouldAdd = false;
+
+            for (DeviceInfoHolder device : _devices) {
+                if (!device.getBluetoothAddress().equals(deviceInfoHolder.getBluetoothAddress())) {
+                    shouldAdd = true;
+                }
+            }
+
+            if (shouldAdd || _devices.isEmpty()) {
+                _foundDevices.add(deviceInfoHolder);
+                _foundDevicesAdapter.notifyDataSetChanged();
+            }
         }
 
         @Override
@@ -232,33 +248,31 @@ public class DevicesFragment extends BaseFragment {
         }
     }
 
+    @AllArgsConstructor
     private class BondWithNewDeviceObserver implements SingleObserver<String> {
+        private DeviceInfoHolder _device;
+
         @Override
         public void onSubscribe(Disposable d) {
 
         }
 
         @Override
-        public void onSuccess(String bluetoothAddress) {
+        public void onSuccess(final String bluetoothAddress) {
+            _httpClient
+                    .addDeviceToUser(_device)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new GetDeviceListResponse(_context));
 
-            for (DeviceInfoHolder device : _devices) {
-                if (device.getBluetoothAddress().equals(bluetoothAddress)) {
-
-                    _httpClient
-                            .addDeviceToUser(new DeviceInfoHolder("New Gaugeter", bluetoothAddress))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new GetDeviceListResponse(_context));
-
-                    _foundDevices.remove(device);
-                    _foundDevicesAdapter.notifyDataSetChanged();
-                }
-            }
+            _foundDevices.remove(_device);
+            _foundDevicesAdapter.notifyDataSetChanged();
         }
 
         @Override
         public void onError(Throwable e) {
-            stopProgress();
+            _devicesListAdapter.stopProgress();
+            ToastNotifier.showBluetoothError(_context, R.string.error_bluetooth_could_not_bond);
         }
     }
 }

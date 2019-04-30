@@ -11,6 +11,7 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -29,7 +30,7 @@ public class HttpClient {
     private HttpService _httpService;
 
     private HttpClient() {
-        final Gson gson = new GsonBuilder()
+        Gson gson = new GsonBuilder()
                 .setFieldNamingStrategy(_namingPolicy)
                 .create();
 
@@ -63,7 +64,7 @@ public class HttpClient {
             return _httpService.getUserDevices();
     }
 
-    public Single<List<DeviceInfoHolder>> removeDeviceFromUser(String bluetoothAddress) {
+    public Call<Void> removeDeviceFromUser(String bluetoothAddress) {
             return _httpService.removeDeviceFromUser(bluetoothAddress);
     }
 

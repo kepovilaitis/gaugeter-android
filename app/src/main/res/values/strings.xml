@@ -42,11 +42,12 @@
     <string name="error_http_internal_server">Server error</string>
 
     <string name="error_bluetooth">Bluetooth error occurred</string>
+    <string name="error_bluetooth_could_not_bond">Could not create bond with the device.</string>
 
     <string name="title_remove_device">Remove device</string>
     <string name="title_add_device">Add device</string>
 
     <string name="dialog_remove_device">Are you sure you want to remove this device from your account?</string>
-    <string name="dialog_add_device">Are you sure you want to add this device to your account?</string>
+    <string name="dialog_add_device">Are you sure you want to add %s to your account?</string>
 
 </resources>
