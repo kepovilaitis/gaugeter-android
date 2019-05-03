@@ -15,28 +15,30 @@ import android.view.View.OnClickListener;
 
 import lt.kepo.gaugeter.R;
 import lt.kepo.gaugeter.activities.MainActivity;
+import lt.kepo.gaugeter.constants.Constants;
 import lt.kepo.gaugeter.constants.Enums.CONNECTION_STATUS;
-import lt.kepo.gaugeter.holders.DeviceInfoHolder;
-import lt.kepo.gaugeter.holders.LiveDataHolder;
+import lt.kepo.gaugeter.holders.DeviceHolder;
 import lt.kepo.gaugeter.constants.PreferenceKeys;
 import lt.kepo.gaugeter.controllers.BluetoothController;
 import lt.kepo.gaugeter.controllers.PreferencesController;
-
-import lt.kepo.gaugeter.holders.WorkHolder;
+import lt.kepo.gaugeter.holders.JobHolder;
+import lt.kepo.gaugeter.holders.TelemDataHolder;
 import lt.kepo.gaugeter.network.BaseResponse;
 import lt.kepo.gaugeter.network.HttpClient;
 import lt.kepo.gaugeter.tools.ToastNotifier;
 import lt.kepo.gaugeter.views.GaugeCardView_;
+
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
-@EFragment(R.layout.fragment_live_data)
-public class LiveDataFragment extends BaseFragment {
+@EFragment(R.layout.fragment_telem_data)
+public class TelemDataFragment extends BaseFragment {
 
     @ViewById(R.id.gaugeOilTemp) GaugeCardView_ _oilTempGaugeCard;
     @ViewById(R.id.gaugeOilPressure) GaugeCardView_ _oilPressureGaugeCard;
@@ -45,12 +47,12 @@ public class LiveDataFragment extends BaseFragment {
 
     private BluetoothController _bluetoothController;
     private HttpClient _httpClient;
-    private Disposable _liveDataDisposable;
+    private Disposable _telemDataDisposable;
     private Disposable _statusDisposable;
-    private DeviceInfoHolder _device;
+    private DeviceHolder _device;
     private FloatingActionButton _fab;
     private Context _context;
-    private WorkHolder _work;
+    private JobHolder _job;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,22 +64,16 @@ public class LiveDataFragment extends BaseFragment {
         _httpClient = HttpClient.getInstance();
         _device = _bluetoothController.getDevice();
         _context = getContext();
-        _work = new WorkHolder(_device.getBluetoothAddress(), new PreferencesController(_context).getUserId());
+        _job = new JobHolder(_device);
 
-        _bluetoothController.getLiveDataSubject()
+        _bluetoothController.getTelemDataSubject()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(_liveDataObserver);
-
-        _bluetoothController.getStateSubject()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(_statusObserver);
+                .subscribe(_telemDataObserver);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // TODO Add your menu entries here
         inflater.inflate(R.menu.live_data_menu, menu);
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -85,7 +81,6 @@ public class LiveDataFragment extends BaseFragment {
 
     @AfterViews
     void setUpViews(){
-
         MainActivity mainActivity = (MainActivity) getActivity();
 
         if (mainActivity != null && mainActivity.isActive() ){
@@ -118,26 +113,43 @@ public class LiveDataFragment extends BaseFragment {
         }
 
         _chargeGaugeCard.setUnits(R.string.volts);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         if (!_bluetoothController.getLiveDataThread().isAlive()){
             _fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_refresh, null));
             _fab.show();
         }
+
+        _bluetoothController.getStateSubject()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(_statusObserver);
     }
 
     @Override
-    public void onDestroy() {
-        if (_liveDataDisposable != null && !_liveDataDisposable.isDisposed()) {
-            _liveDataDisposable.dispose();
-        }
-
+    public void onStop() {
         if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
             _statusDisposable.dispose();
         }
 
-        _bluetoothController.getLiveDataThread().cancel();
+        _fab.hide();
 
-        finishWork();
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (_telemDataDisposable != null && !_telemDataDisposable.isDisposed()) {
+            _telemDataDisposable.dispose();
+        }
+
+        if (_job.getState() != JobHolder.FINISHED) {
+            finishJob();
+        }
 
         super.onDestroy();
     }
@@ -164,7 +176,7 @@ public class LiveDataFragment extends BaseFragment {
         }
     }
 
-    private void updateLiveData(LiveDataHolder data) {
+    private void updateLiveData(TelemDataHolder data) {
         if (isAdded()) {
             _oilPressureGaugeCard.setValue(data.getOilPressure());
             _oilTempGaugeCard.setValue(data.getOilPressure());
@@ -173,38 +185,63 @@ public class LiveDataFragment extends BaseFragment {
         }
     }
 
-    private void updateWork() {
-        _work.setTimeUpdated(System.currentTimeMillis());
+    private void updateJob() {
+        _job.setDateUpdated(System.currentTimeMillis());
 
         _httpClient
-                .upsertWork(_work)
+                .upsertJob(_job)
                 .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(new UpsertWorkResponse(_context));
-
-        _work.resetLiveData();
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new UpsertJobResponse());
     }
 
-    private void finishWork() {
-        _work.setState(WorkHolder.FINISHED);
+    private void finishJob() {
+        _job.setState(JobHolder.FINISHED);
 
-        updateWork();
+        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
+            _statusDisposable.dispose();
+        }
+
+        _bluetoothController.getLiveDataThread().cancel();
+
+        updateJob();
     }
 
-    private Observer<LiveDataHolder> _liveDataObserver = new Observer<LiveDataHolder>() {
+    private void showCompletedJobFragment() {
+        if (_job.getState() == JobHolder.FINISHED) {
+
+            FragmentManager fragmentManager = getFragmentManager();
+
+            if (fragmentManager != null) {
+
+                Bundle args = new Bundle();
+                args.putSerializable(JobHolder.class.getSimpleName(), _job);
+
+                CompletedJobFragment_ completedJobFragment = new CompletedJobFragment_();
+                completedJobFragment.setArguments(args);
+
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.mainContent, completedJobFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        }
+    }
+
+    private Observer<TelemDataHolder> _telemDataObserver = new Observer<TelemDataHolder>() {
         @Override
         public void onSubscribe(Disposable d) {
-            _liveDataDisposable = d;
+            _telemDataDisposable = d;
         }
 
         @Override
-        public void onNext(LiveDataHolder liveDataHolder) {
-            updateLiveData(liveDataHolder);
+        public void onNext(TelemDataHolder telemDataHolder) {
+            updateLiveData(telemDataHolder);
 
-            _work.getLiveData().add(liveDataHolder);
+            _job.addTelemData(telemDataHolder);
 
-            if (_work.getLiveData().size() == 300) {
-                updateWork();
+            if (_job.getTelemData().size() == Constants.MIN_JOB_TELEM_COUNT) {
+                updateJob();
             }
         }
 
@@ -214,7 +251,6 @@ public class LiveDataFragment extends BaseFragment {
 
         @Override
         public void onError(Throwable e) {
-            finishWork();
             e.printStackTrace();
         }
     };
@@ -239,10 +275,10 @@ public class LiveDataFragment extends BaseFragment {
                     _fab.hide();
                     break;
                 case CONNECTED:
-                    _bluetoothController.getLiveDataSubject()
+                    _bluetoothController.getTelemDataSubject()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(_liveDataObserver);
+                            .subscribe(_telemDataObserver);
 
                     stopProgress();
                     break;
@@ -270,28 +306,24 @@ public class LiveDataFragment extends BaseFragment {
     private DialogInterface.OnClickListener _completeWorkDialogClickListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            finishWork();
-
-            FragmentManager fragmentManager = getFragmentManager();
-
-            if (fragmentManager != null) {
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.mainContent, new CompleteWorkFragment_());
-//                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
+            finishJob();
         }
     };
 
-    private class UpsertWorkResponse extends BaseResponse<Integer> {
-        UpsertWorkResponse(Context context) {
-            super(context);
+    private class UpsertJobResponse extends BaseResponse<JobHolder> {
+        UpsertJobResponse() {
+            super(TelemDataFragment.this);
         }
 
         @Override
-        public void onSuccess(Integer id) {
-            _work.setId(id);
+        public void onSuccess(JobHolder job) {
+            _job.setId(job.getId());
+
+            showCompletedJobFragment();
+
+            _job.resetTelemData();
+
+            super.onSuccess(job);
         }
     }
-
 }

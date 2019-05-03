@@ -1,7 +1,7 @@
 package lt.kepo.gaugeter.network;
 
-import android.content.Context;
 import io.reactivex.disposables.Disposable;
+import lt.kepo.gaugeter.fragments.BaseFragment;
 import lt.kepo.gaugeter.tools.ToastNotifier;
 import io.reactivex.SingleObserver;
 import lombok.AllArgsConstructor;
@@ -9,14 +9,23 @@ import retrofit2.HttpException;
 
 @AllArgsConstructor
 public abstract class BaseResponse<T> implements SingleObserver<T> {
-    private Context _context;
+    private final BaseFragment _fragment;
 
     @Override
-    public void onSubscribe(Disposable d) { }
+    public void onSubscribe(Disposable d) {
+        _fragment.startProgress();
+    }
+
+    @Override
+    public void onSuccess(T object) {
+        _fragment.stopProgress();
+    }
 
     @Override
     public void onError(Throwable e) {
+        _fragment.stopProgress();
+
         if (e instanceof HttpException)
-            ToastNotifier.showHttpError(_context, ((HttpException)e).code());
+            ToastNotifier.showHttpError(_fragment.getContext(), ((HttpException)e).code());
     }
 }

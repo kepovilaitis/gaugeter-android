@@ -4,28 +4,21 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import lombok.RequiredArgsConstructor;
+
 import lt.kepo.gaugeter.R;
-import lt.kepo.gaugeter.holders.DeviceInfoHolder;
-import lt.kepo.gaugeter.interfaces.OnDeviceAction;
+import lt.kepo.gaugeter.holders.DeviceHolder;
+import lt.kepo.gaugeter.interfaces.OnItemClickListener;
 
 import java.util.List;
 
-@RequiredArgsConstructor
-public class FoundDevicesAdapter extends RecyclerView.Adapter<FoundDevicesAdapter.ViewHolder> {
-    final private List<DeviceInfoHolder> _foundDevices;
-    final private Context _context;
-    final private OnDeviceAction _onDeviceAction;
+public class FoundDevicesAdapter extends BaseListAdapter<DeviceHolder> {
 
-    private int _selectedPosition = -1;
-    private boolean _isClickable = true;
+    public FoundDevicesAdapter(List<DeviceHolder> jobs, Context context, OnItemClickListener<DeviceHolder> onItemClickListener){
+        super(jobs, context, onItemClickListener);
+    }
 
     @NonNull
     @Override
@@ -34,44 +27,24 @@ public class FoundDevicesAdapter extends RecyclerView.Adapter<FoundDevicesAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        DeviceInfoHolder device = _foundDevices.get(position);
+    public void onBindViewHolder(@NonNull BaseListAdapter.ViewHolder viewHolder, int position) {
+        DeviceHolder device = _list.get(position);
 
         viewHolder.itemView.setSelected(_selectedPosition == position);
         viewHolder.progressBar.setVisibility(_selectedPosition == position ? View.VISIBLE : View.GONE);
-        viewHolder.textName.setText(device.getName());
-        viewHolder.textAddress.setText(device.getBluetoothAddress());
+        viewHolder.textPrimary.setText(device.getName());
+        viewHolder.textSecondary.setText(device.getBluetoothAddress());
     }
 
     @Override
     public int getItemCount() {
-        return _foundDevices.size();
+        return _list.size();
     }
 
-    private void startProgress() {
-        notifyItemChanged(_selectedPosition);
-
-        _isClickable = false;
-    }
-
-    public void stopProgress() {
-        _selectedPosition = -1;
-        _isClickable = true;
-
-        notifyDataSetChanged();
-    }
-
-    class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView textName;
-        private TextView textAddress;
-        private FrameLayout progressBar;
+    class ViewHolder extends BaseListAdapter.ViewHolder {
 
         ViewHolder(final View itemView) {
             super(itemView);
-
-            textName = itemView.findViewById(R.id.textName);
-            textAddress = itemView.findViewById(R.id.textAddress);
-            progressBar = itemView.findViewById(R.id.progressBar);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -81,11 +54,13 @@ public class FoundDevicesAdapter extends RecyclerView.Adapter<FoundDevicesAdapte
 
                     _selectedPosition = getLayoutPosition();
 
+                    startProgress();
+
                     new AlertDialog.Builder(_context)
                             .setTitle(R.string.title_add_device)
                             .setPositiveButton(R.string.yes, new DialogPositiveClickListener())
                             .setNegativeButton(R.string.no, null)
-                            .setMessage(_context.getResources().getString(R.string.dialog_add_device, _foundDevices.get(_selectedPosition).getName()))
+                            .setMessage(_context.getResources().getString(R.string.dialog_add_device, _list.get(_selectedPosition).getName()))
                             .create()
                             .show();
                 }
@@ -96,9 +71,7 @@ public class FoundDevicesAdapter extends RecyclerView.Adapter<FoundDevicesAdapte
     private class DialogPositiveClickListener implements DialogInterface.OnClickListener {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            startProgress();
-
-            _onDeviceAction.execute(_foundDevices.get(_selectedPosition));
+            _onItemClickListener.execute(_list.get(_selectedPosition));
         }
     }
 }

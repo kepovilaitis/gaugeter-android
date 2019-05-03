@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <item type="id" name="mainContent" />
-    <item type="id" name="textEmpty" />
-    <item type="id" name="fab" />
+    <item type="id" name="mainContent"/>
+    <item type="id" name="textEmpty"/>
+    <item type="id" name="fab"/>
     <item type="id" name="toolbar" />
     <item type="id" name="drawerLayout" />
     <item type="id" name="navigationView" />
-    <item type="id" name="textName" />
-    <item type="id" name="textStatus" />
+    <item type="id" name="textPrimary" />
+    <item type="id" name="textSecondary" />
     <item type="id" name="textAddress" />
     <item type="id" name="imageView" />
     <item type="id" name="value" />
@@ -20,8 +20,10 @@
     <item type="id" name="textView" />
     <item type="id" name="textEmail" />
     <item type="id" name="textFullName" />
+    <item type="id" name="textStart" />
+    <item type="id" name="textEnd" />
 
-    <item type="id" name="listView" />
+    <item type="id" name="recyclerView" />
     <item type="id" name="recyclerViewPairedDevices"/>
     <item type="id" name="recyclerViewFoundDevices"/>
 
@@ -34,6 +36,7 @@
     <item type="id" name="gaugeText"/>
     <item type="id" name="gaugeChart"/>
 
+    <item type="id" name="btn" />
     <item type="id" name="btnExpand" />
     <item type="id" name="btnSearch"/>
     <item type="id" name="btnSubmit"/>
@@ -42,16 +45,17 @@
     <item type="id" name="relativeLayout"/>
     <item type="id" name="progressBar"/>
 
-    <item type="id" name="menuSettings"/>
-    <item type="id" name="menuAccountSettings"/>
 
     <item type="id" name="settingsContainer"/>
 
     <item type="id" name="editUsername"/>
     <item type="id" name="editPassword"/>
 
+    <item type="id" name="menuSettings"/>
+    <item type="id" name="menuAccountSettings"/>
     <item type="id" name="menuLogout"/>
     <item type="id" name="menuDeviceSettings"/>
     <item type="id" name="menuComplete"/>
+    <item type="id" name="menuJobsByDate"/>
 
 </resources>

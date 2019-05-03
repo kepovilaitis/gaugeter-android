@@ -26,4 +26,6 @@ public class Constants {
 
     public static final int PERMISSION_COARSE_LOCATION = 1;
     public static final int PERMISSION_BLUETOOTH_ADMIN = 2;
+
+    public static final int MIN_JOB_TELEM_COUNT = 300;
 }

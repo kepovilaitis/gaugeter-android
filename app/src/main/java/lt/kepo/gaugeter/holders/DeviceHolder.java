@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Getter
 @AllArgsConstructor
-public class DeviceInfoHolder implements Serializable {
+public class DeviceHolder implements Serializable {
     private String _name;
     private String _bluetoothAddress;
 }

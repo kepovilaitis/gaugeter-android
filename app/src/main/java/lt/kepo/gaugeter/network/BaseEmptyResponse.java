@@ -1,9 +1,12 @@
 package lt.kepo.gaugeter.network;
 
-import android.content.Context;
 import lt.kepo.gaugeter.constants.ErrorCodes;
 import lt.kepo.gaugeter.tools.ToastNotifier;
+
+import android.content.Context;
+
 import lombok.AllArgsConstructor;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 

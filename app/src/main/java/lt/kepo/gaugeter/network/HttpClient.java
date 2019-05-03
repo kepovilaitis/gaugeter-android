@@ -1,21 +1,26 @@
 package lt.kepo.gaugeter.network;
 
-import lt.kepo.gaugeter.holders.DeviceInfoHolder;
+import lt.kepo.gaugeter.holders.DeviceHolder;
 import lt.kepo.gaugeter.holders.LoginHolder;
+import lt.kepo.gaugeter.holders.JobHolder;
+
 import com.google.gson.FieldNamingStrategy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import lombok.Getter;
 import lombok.Setter;
-import lt.kepo.gaugeter.holders.WorkHolder;
+
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+
 import io.reactivex.Single;
 
 import java.io.IOException;
@@ -49,30 +54,6 @@ public class HttpClient {
         _instance = new HttpClient();
     }
 
-    public Single<LoginHolder> login(LoginHolder loginHolder) {
-        return _httpService.login(loginHolder);
-    }
-
-    public void logout() {
-        _userToken = "";
-    }
-
-    public Single<List<DeviceInfoHolder>> addDeviceToUser(DeviceInfoHolder device) {
-        return _httpService.addDeviceToUser(device);
-    }
-
-    public Single<List<DeviceInfoHolder>> getUserDevices() {
-            return _httpService.getUserDevices();
-    }
-
-    public Call<Void> removeDeviceFromUser(String bluetoothAddress) {
-            return _httpService.removeDeviceFromUser(bluetoothAddress);
-    }
-
-    public Single<Integer> upsertWork(WorkHolder workHolder) {
-            return _httpService.upsertWork(workHolder);
-    }
-
     private FieldNamingStrategy _namingPolicy = new FieldNamingStrategy() {
         @Override
         public String translateName(Field field) {
@@ -94,4 +75,45 @@ public class HttpClient {
             return chain.proceed(request);
         }
     };
+
+    public Single<LoginHolder> login(LoginHolder loginHolder) {
+        return _httpService.login(loginHolder);
+    }
+
+    public void logout() {
+        _userToken = "";
+    }
+
+    public Single<List<DeviceHolder>> addDeviceToUser(DeviceHolder device) {
+        return _httpService.addDeviceToUser(device);
+    }
+
+    public Single<List<DeviceHolder>> getUserDevices() {
+        return _httpService.getUserDevices();
+    }
+
+    public Call<Void> removeDeviceFromUser(String bluetoothAddress) {
+        return _httpService.removeDeviceFromUser(bluetoothAddress);
+    }
+
+    public Single<JobHolder> upsertJob(JobHolder jobHolder) {
+        return _httpService.upsertJob(jobHolder);
+    }
+
+    public Call<Void> deleteJob(int jobId) {
+        return _httpService.deleteJob(jobId);
+    }
+
+    public Single<JobHolder> getJob(int jobId) {
+        return _httpService.getJob(jobId);
+    }
+
+    public Single<List<JobHolder>> getJobsByDate(long start, long end) {
+        return _httpService.getJobsByDate(start, end);
+    }
+
+    public Single<JobHolder> getLast() {
+        return _httpService.getLast();
+    }
+
 }

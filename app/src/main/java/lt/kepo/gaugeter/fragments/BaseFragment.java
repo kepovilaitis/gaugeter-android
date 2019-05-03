@@ -2,11 +2,12 @@ package lt.kepo.gaugeter.fragments;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+
 import lt.kepo.gaugeter.activities.BaseActivity;
 
-abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment {
 
-    void startProgress() {
+    public void startProgress() {
         FragmentActivity activity = getActivity();
 
         if (activity instanceof BaseActivity){
@@ -14,7 +15,7 @@ abstract class BaseFragment extends Fragment {
         }
     }
 
-    void stopProgress() {
+    public void stopProgress() {
         FragmentActivity activity = getActivity();
 
         if (activity instanceof BaseActivity){

@@ -1,6 +1,7 @@
 package lt.kepo.gaugeter.holders;
 
 import lt.kepo.gaugeter.constants.Enums.MEASUREMENT_SYSTEM;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

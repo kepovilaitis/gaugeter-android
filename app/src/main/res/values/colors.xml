@@ -9,6 +9,8 @@
     <color name="colorBackground">#c8d0d4</color>
 
     <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+
     <color name="bg_row_background">#fa315b</color>
 
     <color name="progress_bar_background">#40FFFFFF</color>

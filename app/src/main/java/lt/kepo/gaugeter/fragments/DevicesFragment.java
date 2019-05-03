@@ -15,18 +15,21 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 
-import io.reactivex.SingleObserver;
 import lombok.AllArgsConstructor;
+
 import lt.kepo.gaugeter.R;
+import lt.kepo.gaugeter.activities.MainActivity;
 import lt.kepo.gaugeter.adapters.FoundDevicesAdapter;
 import lt.kepo.gaugeter.constants.Enums.CONNECTION_STATUS;
 import lt.kepo.gaugeter.controllers.BluetoothController;
 import lt.kepo.gaugeter.adapters.DevicesListAdapter;
-import lt.kepo.gaugeter.holders.DeviceInfoHolder;
-import lt.kepo.gaugeter.interfaces.OnDeviceAction;
+import lt.kepo.gaugeter.holders.DeviceHolder;
+import lt.kepo.gaugeter.interfaces.OnItemClickListener;
 import lt.kepo.gaugeter.network.BaseResponse;
 import lt.kepo.gaugeter.network.HttpClient;
 import lt.kepo.gaugeter.tools.ToastNotifier;
+
+import io.reactivex.SingleObserver;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -42,8 +45,8 @@ public class DevicesFragment extends BaseFragment {
     private Context _context;
     private Disposable _statusDisposable;
 
-    private List<DeviceInfoHolder> _devices = new ArrayList<>();
-    private List<DeviceInfoHolder> _foundDevices = new ArrayList<>();
+    private List<DeviceHolder> _devices = new ArrayList<>();
+    private List<DeviceHolder> _foundDevices = new ArrayList<>();
     private HttpClient _httpClient = HttpClient.getInstance();
 
     @Override
@@ -61,16 +64,22 @@ public class DevicesFragment extends BaseFragment {
 
         setHasOptionsMenu(true);
 
+        MainActivity mainActivity = (MainActivity) getActivity();
+
+        if (mainActivity != null && mainActivity.isActive()) {
+            mainActivity.setTitle(R.string.app_name);
+        }
+
         main.<EditText>findViewById(R.id.search).addTextChangedListener(_queryTextListener);
         RecyclerView devicesList = main.findViewById(R.id.recyclerViewPairedDevices);
         RecyclerView foundDevicesList = main.findViewById(R.id.recyclerViewFoundDevices);
 
         devicesList.setLayoutManager(new LinearLayoutManager(_context));
-        _devicesListAdapter = new DevicesListAdapter(_devices, _context, _connectToDeviceAction);
+        _devicesListAdapter = new DevicesListAdapter(_devices, _context, _connectToDeviceClickListener);
         devicesList.setAdapter(_devicesListAdapter);
 
         foundDevicesList.setLayoutManager(new LinearLayoutManager(_context));
-        _foundDevicesAdapter = new FoundDevicesAdapter(_foundDevices, _context, _bondWithDeviceAction);
+        _foundDevicesAdapter = new FoundDevicesAdapter(_foundDevices, _context, _bondWithDeviceClickListener);
         foundDevicesList.setAdapter(_foundDevicesAdapter);
 
         main.findViewById(R.id.btnSearch).setOnClickListener(_discoverDevicesClickListener);
@@ -79,7 +88,7 @@ public class DevicesFragment extends BaseFragment {
                 .getUserDevices()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new GetDeviceListResponse(_context));
+                .subscribe(new GetDeviceListResponse());
 
         return main;
     }
@@ -111,17 +120,17 @@ public class DevicesFragment extends BaseFragment {
         }
     };
 
-    private OnDeviceAction _connectToDeviceAction = new OnDeviceAction() {
+    private OnItemClickListener _connectToDeviceClickListener = new OnItemClickListener<DeviceHolder>() {
         @Override
-        public void execute(DeviceInfoHolder device) {
+        public void execute(DeviceHolder device) {
             _bluetoothController.setDevice(device);
             _bluetoothController.connectToDevice(_context, device.getBluetoothAddress(), null);
         }
     };
 
-    private OnDeviceAction _bondWithDeviceAction = new OnDeviceAction() {
+    private OnItemClickListener _bondWithDeviceClickListener = new OnItemClickListener<DeviceHolder>() {
         @Override
-        public void execute(DeviceInfoHolder device) {
+        public void execute(DeviceHolder device) {
             _bluetoothController.bondWithDevice(_context, device.getBluetoothAddress(), new BondWithNewDeviceObserver(device));
         }
     };
@@ -160,7 +169,7 @@ public class DevicesFragment extends BaseFragment {
 
                     if (fragmentManager != null) {
                         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.mainContent, new LiveDataFragment_());
+                        fragmentTransaction.replace(R.id.mainContent, new TelemDataFragment_());
                         fragmentTransaction.addToBackStack(null);
                         fragmentTransaction.commit();
                     }
@@ -180,22 +189,22 @@ public class DevicesFragment extends BaseFragment {
         }
     };
 
-    private class GetDeviceListResponse extends BaseResponse<List<DeviceInfoHolder>> {
-        GetDeviceListResponse(Context context) {
-            super(context);
+    private class GetDeviceListResponse extends BaseResponse<List<DeviceHolder>> {
+        GetDeviceListResponse() {
+            super(DevicesFragment.this);
         }
 
         @Override
         public void onSubscribe(Disposable d) {
-            startProgress();
+            super.onSubscribe(d);
 
             _foundDevices.clear();
             _foundDevicesAdapter.notifyDataSetChanged();
         }
 
         @Override
-        public void onSuccess(List<DeviceInfoHolder> devices) {
-            stopProgress();
+        public void onSuccess(List<DeviceHolder> devices) {
+            super.onSuccess(devices);
             _foundDevicesAdapter.stopProgress();
 
             _devices.clear();
@@ -205,14 +214,13 @@ public class DevicesFragment extends BaseFragment {
 
         @Override
         public void onError(Throwable e) {
-            stopProgress();
             _foundDevicesAdapter.stopProgress();
 
             super.onError(e);
         }
     }
 
-    private class FoundDevicesObserver implements Observer<DeviceInfoHolder> {
+    private class FoundDevicesObserver implements Observer<DeviceHolder> {
         @Override
         public void onSubscribe(Disposable d) {
             startProgress();
@@ -222,17 +230,17 @@ public class DevicesFragment extends BaseFragment {
         }
 
         @Override
-        public void onNext(DeviceInfoHolder deviceInfoHolder) {
+        public void onNext(DeviceHolder deviceHolder) {
             boolean shouldAdd = false;
 
-            for (DeviceInfoHolder device : _devices) {
-                if (!device.getBluetoothAddress().equals(deviceInfoHolder.getBluetoothAddress())) {
+            for (DeviceHolder device : _devices) {
+                if (!device.getBluetoothAddress().equals(deviceHolder.getBluetoothAddress())) {
                     shouldAdd = true;
                 }
             }
 
             if (shouldAdd || _devices.isEmpty()) {
-                _foundDevices.add(deviceInfoHolder);
+                _foundDevices.add(deviceHolder);
                 _foundDevicesAdapter.notifyDataSetChanged();
             }
         }
@@ -251,7 +259,7 @@ public class DevicesFragment extends BaseFragment {
 
     @AllArgsConstructor
     private class BondWithNewDeviceObserver implements SingleObserver<String> {
-        private DeviceInfoHolder _device;
+        private DeviceHolder _device;
 
         @Override
         public void onSubscribe(Disposable d) {
@@ -264,7 +272,7 @@ public class DevicesFragment extends BaseFragment {
                     .addDeviceToUser(_device)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new GetDeviceListResponse(_context));
+                    .subscribe(new GetDeviceListResponse());
 
             _foundDevices.remove(_device);
             _foundDevicesAdapter.notifyDataSetChanged();

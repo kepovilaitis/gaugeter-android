@@ -35,7 +35,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@id/textName"
+                android:id="@id/textPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="32dp"
                 android:textColor="@android:color/black"
@@ -44,7 +44,7 @@
                 android:fontFamily="@assets/font/worksans_regular"/>
 
             <TextView
-                android:id="@id/textAddress"
+                android:id="@id/textSecondary"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:textColor="@android:color/black"

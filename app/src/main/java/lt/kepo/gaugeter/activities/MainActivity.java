@@ -10,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -19,21 +20,17 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import android.view.View;
 import android.widget.TextView;
+
 import lt.kepo.gaugeter.R;
 import lt.kepo.gaugeter.constants.Constants;
-import lt.kepo.gaugeter.constants.Enums.CONNECTION_STATUS;
 import lt.kepo.gaugeter.controllers.BluetoothController;
 import lt.kepo.gaugeter.controllers.PreferencesController;
 import lt.kepo.gaugeter.fragments.DevicesFragment;
-
+import lt.kepo.gaugeter.fragments.JobsByDateFragment_;
 import lt.kepo.gaugeter.network.HttpClient;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
+
 import lombok.Getter;
 
 public class MainActivity extends BaseActivity implements OnNavigationItemSelectedListener {
@@ -43,7 +40,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
     private DrawerLayout _menuLayout;
     private ActionBarDrawerToggle _menuToggle;
-    private Disposable _statusDisposable;
+//    private Disposable _statusDisposable;
     private BluetoothController _bluetoothController = BluetoothController.getInstance();
 
     @Override
@@ -60,10 +57,10 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         fragmentTransaction.add(R.id.mainContent, new DevicesFragment());
         fragmentTransaction.commit();
 
-        _bluetoothController.getStateSubject()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(_statusObserver);
+//        _bluetoothController.getStateSubject()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(_statusObserver);
     }
 
     @Override
@@ -95,9 +92,9 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
     @Override
     public void onDestroy() {
-        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
-            _statusDisposable.dispose();
-        }
+//        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
+//            _statusDisposable.dispose();
+//        }
 
         super.onDestroy();
     }
@@ -142,6 +139,18 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         }
 
         switch (item.getItemId()){
+            case R.id.menuJobsByDate:
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+
+                if (fragmentManager != null) {
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.mainContent, new JobsByDateFragment_());
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+
+                break;
             case R.id.menuLogout:
 
                 new PreferencesController(getApplicationContext()).deleteSessionData();
@@ -176,11 +185,9 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
 
-        PreferencesController preferencesController = new PreferencesController(getApplicationContext());
-
         View headerView = navigationView.getHeaderView(0);
         TextView navUsername = headerView.findViewById(R.id.textFullName);
-        navUsername.setText(preferencesController.getUserId());
+        navUsername.setText(new PreferencesController(getApplicationContext()).getUserId());
 
         _menuToggle = new ActionBarDrawerToggle(this, _menuLayout, R.string.menu_open, R.string.menu_close) {
             public void onDrawerClosed(View view) {
@@ -209,36 +216,36 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         return false;
     }
 
-    private Observer<CONNECTION_STATUS> _statusObserver = new Observer<CONNECTION_STATUS>() {
-        @Override
-        public void onSubscribe(Disposable d) {
-            _statusDisposable = d;
-        }
-
-        @Override
-        public void onNext(CONNECTION_STATUS connection_status) {
-            switch (connection_status) {
-                case DISCONNECTED:
-//                    ToastNotifier.showBluetoothError(MainActivity.this, R.string.message_connection_closed);
-
-                    break;
-                case CONNECTED:
-
-//                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-//                    fragmentTransaction.replace(R.id.mainContent, new LiveDataFragment_());
-//                    fragmentTransaction.addToBackStack(null);
-//                    fragmentTransaction.commit();
-
-                    break;
-            }
-        }
-
-        @Override
-        public void onComplete() {
-        }
-
-        @Override
-        public void onError(Throwable e) {
-        }
-    };
+//    private Observer<CONNECTION_STATUS> _statusObserver = new Observer<CONNECTION_STATUS>() {
+//        @Override
+//        public void onSubscribe(Disposable d) {
+//            _statusDisposable = d;
+//        }
+//
+//        @Override
+//        public void onNext(CONNECTION_STATUS connection_status) {
+//            switch (connection_status) {
+//                case DISCONNECTED:
+////                    ToastNotifier.showBluetoothError(MainActivity.this, R.string.message_connection_closed);
+//
+//                    break;
+//                case CONNECTED:
+//
+////                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+////                    fragmentTransaction.replace(R.id.mainContent, new TelemDataFragment_());
+////                    fragmentTransaction.addToBackStack(null);
+////                    fragmentTransaction.commit();
+//
+//                    break;
+//            }
+//        }
+//
+//        @Override
+//        public void onComplete() {
+//        }
+//
+//        @Override
+//        public void onError(Throwable e) {
+//        }
+//    };
 }

@@ -14,10 +14,12 @@ import java.io.*;
 import io.reactivex.*;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
+
 import lombok.*;
+
 import lt.kepo.gaugeter.constants.Enums.CONNECTION_STATUS;
-import lt.kepo.gaugeter.holders.DeviceInfoHolder;
-import lt.kepo.gaugeter.holders.LiveDataHolder;
+import lt.kepo.gaugeter.holders.DeviceHolder;
+import lt.kepo.gaugeter.holders.TelemDataHolder;
 import lt.kepo.gaugeter.tools.ByteParser;
 
 //https://stackoverflow.com/questions/35647767/android-bluetooth-wake-up-device
@@ -29,10 +31,10 @@ public class BluetoothController {
 
     @Getter private static BluetoothController _instance;
     @Getter private ReadLiveDataThread _liveDataThread;
-    @Getter @Setter DeviceInfoHolder _device;
+    @Getter @Setter DeviceHolder _device;
 
     @Getter private PublishSubject<CONNECTION_STATUS> _stateSubject = PublishSubject.create();
-    @Getter private PublishSubject<LiveDataHolder> _liveDataSubject;
+    @Getter private PublishSubject<TelemDataHolder> _telemDataSubject;
 
     private static BluetoothAdapter _adapter;
 
@@ -45,7 +47,7 @@ public class BluetoothController {
         return _adapter.isEnabled();
     }
 
-    public void discoverDevices(Context context, final Observer<DeviceInfoHolder> observer) {
+    public void discoverDevices(Context context, final Observer<DeviceHolder> observer) {
         if (_adapter.isDiscovering()) {
             _adapter.cancelDiscovery();
         }
@@ -58,9 +60,9 @@ public class BluetoothController {
 
         context.registerReceiver(new SearchDevicesReceiver(observer), filter);
 
-        Observable.create(new ObservableOnSubscribe<DeviceInfoHolder>() {
+        Observable.create(new ObservableOnSubscribe<DeviceHolder>() {
             @Override
-            public void subscribe(ObservableEmitter<DeviceInfoHolder> emitter) {
+            public void subscribe(ObservableEmitter<DeviceHolder> emitter) {
                 _adapter.startDiscovery();
             }
         })
@@ -124,7 +126,7 @@ public class BluetoothController {
 
     @AllArgsConstructor
     private class SearchDevicesReceiver extends BroadcastReceiver {
-        Observer<DeviceInfoHolder> _observer;
+        Observer<DeviceHolder> _observer;
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -139,7 +141,7 @@ public class BluetoothController {
                         && device.getName().equals(HC_05_DEFAULT_NAME)) {
 
                     _observer.onNext(
-                            new DeviceInfoHolder(
+                            new DeviceHolder(
                                     device.getName(),
                                     device.getAddress()
                             )
@@ -222,7 +224,7 @@ public class BluetoothController {
                 try {
                     _socket.getOutputStream().write(0);
                     _stateSubject.onNext(CONNECTION_STATUS.CONNECTED);
-                    _liveDataSubject = PublishSubject.create();
+                    _telemDataSubject = PublishSubject.create();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -243,8 +245,8 @@ public class BluetoothController {
 
                         if (checksum == oilTemperature + oilPressure + waterTemperature + charge){
 
-                            _liveDataSubject.onNext(
-                                new LiveDataHolder(
+                            _telemDataSubject.onNext(
+                                new TelemDataHolder(
                                     oilTemperature,
                                     oilPressure,
                                     waterTemperature,
@@ -252,7 +254,7 @@ public class BluetoothController {
                                 )
                             );
                         } else {
-                            _liveDataSubject.onError(new Throwable());
+                            _telemDataSubject.onError(new Throwable());
                             Log.d("Incorrect", " checksum!");
                             return;
                         }
@@ -261,7 +263,7 @@ public class BluetoothController {
                     e.printStackTrace();
                     cancel();
 
-                    _liveDataSubject.onError(new Throwable());
+                    _telemDataSubject.onError(new Throwable());
                     _stateSubject.onNext(CONNECTION_STATUS.DISCONNECTED);
                 }
             }

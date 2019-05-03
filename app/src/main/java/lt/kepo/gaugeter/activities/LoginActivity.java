@@ -5,18 +5,23 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+
 import lt.kepo.gaugeter.R;
 import lt.kepo.gaugeter.constants.Constants;
 import lt.kepo.gaugeter.controllers.PreferencesController;
-import lt.kepo.gaugeter.helpers.KeyboardHelper;
 import lt.kepo.gaugeter.holders.LoginHolder;
 import lt.kepo.gaugeter.holders.UserInfoHolder;
-import lt.kepo.gaugeter.network.BaseResponse;
 import lt.kepo.gaugeter.network.HttpClient;
 
+import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+
+import lt.kepo.gaugeter.tools.ToastNotifier;
+
+import lt.kepo.gaugeter.tools.Utils;
+import retrofit2.HttpException;
 
 public class LoginActivity extends BaseActivity {
     private EditText _userId;
@@ -53,7 +58,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void login(LoginHolder loginHolder) {
-        KeyboardHelper.hideKeyboard(this);
+        Utils.hideKeyboard(this);
 
         _httpClient
                 .login(loginHolder)
@@ -77,11 +82,7 @@ public class LoginActivity extends BaseActivity {
         }
     };
 
-    private class LoginResponse extends BaseResponse<LoginHolder> {
-        LoginResponse() {
-            super(LoginActivity.this);
-        }
-
+    private class LoginResponse implements SingleObserver<LoginHolder> {
         @Override
         public void onSubscribe(Disposable d) {
             startProgress();
@@ -96,6 +97,14 @@ public class LoginActivity extends BaseActivity {
             _httpClient.setUserToken(loginHolder.getToken());
             stopProgress();
             startMainActivity();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            stopProgress();
+
+            if (e instanceof HttpException)
+                ToastNotifier.showHttpError(LoginActivity.this, ((HttpException)e).code());
         }
     }
 }
