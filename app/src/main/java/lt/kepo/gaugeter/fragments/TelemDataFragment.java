@@ -129,7 +129,7 @@ public class TelemDataFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        if (resultCode == Activity.RESULT_OK && requestCode == 1) {
+        if (resultCode == Activity.RESULT_OK && requestCode == Constants.REQUEST_EDIT_DEVICE) {
             setTitle(intent.getStringExtra(DeviceHolder.class.getSimpleName()));
         }
     }
@@ -142,14 +142,12 @@ public class TelemDataFragment extends BaseFragment {
                 FragmentManager fragmentManager = getFragmentManager();
 
                 if (fragmentManager != null) {
-
                     Bundle args = new Bundle();
                     args.putSerializable(DeviceHolder.class.getSimpleName(), _device);
 
                     EditDeviceFragment editDeviceFragment = new EditDeviceFragment();
                     editDeviceFragment.setArguments(args);
-
-                    editDeviceFragment.setTargetFragment(this, 1);
+                    editDeviceFragment.setTargetFragment(this, Constants.REQUEST_EDIT_DEVICE);
 
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.add(R.id.mainContent, editDeviceFragment);
@@ -186,11 +184,11 @@ public class TelemDataFragment extends BaseFragment {
         }
     }
 
-    private void updateJob() {
-        _job.setDateUpdated(System.currentTimeMillis());
+    private void updateJob(final JobHolder job) {
+        job.setDateUpdated(System.currentTimeMillis());
 
         _httpClient
-                .upsertJob(_job)
+                .upsertJob(job)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new UpsertJobResponse());
@@ -205,10 +203,13 @@ public class TelemDataFragment extends BaseFragment {
 
         _bluetoothController.getLiveDataThread().cancel();
 
-        updateJob();
+        final JobHolder job = new JobHolder(_job);
+
+        updateJob(job);
+        showCompletedJobFragment(job);
     }
 
-    private void showCompletedJobFragment() {
+    private void showCompletedJobFragment(final JobHolder job) {
         if (_job.getState() == JobHolder.FINISHED && (!isRemoving() && isVisible())) {
 
             FragmentManager fragmentManager = getFragmentManager();
@@ -216,7 +217,7 @@ public class TelemDataFragment extends BaseFragment {
             if (fragmentManager != null) {
 
                 Bundle args = new Bundle();
-                args.putSerializable(JobHolder.class.getSimpleName(), _job);
+                args.putSerializable(JobHolder.class.getSimpleName(), job);
 
                 CompletedJobFragment completedJobFragment = new CompletedJobFragment();
                 completedJobFragment.setArguments(args);
@@ -242,7 +243,7 @@ public class TelemDataFragment extends BaseFragment {
             _job.addTelemData(telemDataHolder);
 
             if (_job.getTelemData().size() == Constants.MIN_JOB_TELEM_COUNT) {
-                updateJob();
+                updateJob(new JobHolder(_job));
             }
         }
 
@@ -301,6 +302,7 @@ public class TelemDataFragment extends BaseFragment {
         @Override
         public void onClick(View v) {
             startProgress();
+
             _fab.hide();
             _bluetoothController.reconnectToDevice();
         }
@@ -319,14 +321,29 @@ public class TelemDataFragment extends BaseFragment {
         }
 
         @Override
+        public void onSubscribe(Disposable disposable) {
+            _job.resetTelemData();
+        }
+
+        @Override
         public void onSuccess(JobHolder job) {
             _job.setId(job.getId());
 
-            showCompletedJobFragment();
-
-            _job.resetTelemData();
-
             super.onSuccess(job);
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            FragmentManager fragmentManager = getFragmentManager();
+
+            if (fragmentManager != null) {
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.mainContent, new DevicesFragment());
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+
+            super.onError(e);
         }
     }
 }

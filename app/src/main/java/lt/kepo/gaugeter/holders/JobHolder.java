@@ -29,6 +29,15 @@ public class JobHolder implements Serializable{
         _dateCreated = System.currentTimeMillis();
     }
 
+    public JobHolder(JobHolder job) {
+        _id = job._id;
+        _device = job.getDevice();
+        _state = job.getState();
+        _telemData = job.getTelemData();
+        _dateCreated = job.getDateCreated();
+        _dateUpdated = job.getDateUpdated();
+    }
+
     public void addTelemData(TelemDataHolder telemData) {
         _telemData.add(telemData);
     }

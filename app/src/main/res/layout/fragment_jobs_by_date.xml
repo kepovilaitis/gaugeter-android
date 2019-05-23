@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -23,7 +24,7 @@
                 android:layout_height="50dp"
                 android:orientation="horizontal"
                 android:background="@drawable/input_field_background"
-                android:paddingStart="8dp"
+                android:paddingStart="4dp"
                 android:paddingEnd="8dp">
 
                 <ImageView
@@ -55,8 +56,8 @@
                 android:layout_height="50dp"
                 android:orientation="horizontal"
                 android:background="@drawable/input_field_background"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp">
+                android:paddingStart="4dp"
+                android:paddingEnd="8dp">
 
                 <ImageView
                     android:layout_width="40dp"

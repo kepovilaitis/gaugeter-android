@@ -2,6 +2,10 @@ package lt.kepo.gaugeter.constants;
 
 public class Constants {
     public final static int REQUEST_ENABLE_BT = 1;
+    public final static int REQUEST_EDIT_DEVICE = 2;
+    public static final int PERMISSION_COARSE_LOCATION = 1;
+    public static final int PERMISSION_BLUETOOTH_ADMIN = 2;
+
     public static final int SIZE = 300;
     public static final float TOP = 0.0f;
     public static final float LEFT = 0.0f;
@@ -27,9 +31,6 @@ public class Constants {
     public static final String USER_MEASUREMENT_SYSTEM = "user_measurement_system";
     public static final String LOGGED_IN = "logged_in";
     public static final String USER_TOKEN = "user_token";
-
-    public static final int PERMISSION_COARSE_LOCATION = 1;
-    public static final int PERMISSION_BLUETOOTH_ADMIN = 2;
 
     public static final int MIN_JOB_TELEM_COUNT = 300;
 }

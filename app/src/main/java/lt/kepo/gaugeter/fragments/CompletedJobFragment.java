@@ -48,7 +48,7 @@ public class CompletedJobFragment extends BaseFragment {
 
         _chart = main.findViewById(R.id.chart);
 
-        setTitle(Utils.getFormattedDate(_job.getDateCreated()));
+        setTitle(Utils.getFormattedDateTime(_job.getDateCreated()));
 
         List<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(getOilPressureDataSet());

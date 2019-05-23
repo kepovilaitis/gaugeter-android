@@ -13,7 +13,7 @@ import lt.kepo.gaugeter.tools.Utils;
 
 public abstract class BaseFragment extends Fragment {
 
-    private MainActivity _mainActivity;
+    MainActivity _mainActivity;
     FloatingActionButton _fab;
     Context _context;
     HttpClient _httpClient;

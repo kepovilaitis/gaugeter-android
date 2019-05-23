@@ -6,7 +6,6 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
 import lt.kepo.gaugeter.constants.Constants;
-import lt.kepo.gaugeter.constants.Enums.MEASUREMENT_SYSTEM;
 import lt.kepo.gaugeter.constants.PreferenceKeys;
 
 import lombok.Getter;

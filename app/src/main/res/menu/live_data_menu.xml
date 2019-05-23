@@ -5,7 +5,7 @@
     <item
         android:id="@id/menuDeviceSettings"
         android:icon="@drawable/ic_settings"
-        android:title="@string/settings"
+        android:title="@string/title_edit_device"
         app:showAsAction="ifRoom"/>
 
     <item

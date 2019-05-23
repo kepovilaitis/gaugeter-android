@@ -17,6 +17,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 import lt.kepo.gaugeter.R;
+import lt.kepo.gaugeter.constants.Constants;
 import lt.kepo.gaugeter.holders.DeviceHolder;
 import lt.kepo.gaugeter.network.BaseResponse;
 import lt.kepo.gaugeter.tools.ToastNotifier;
@@ -95,7 +96,10 @@ public class EditDeviceFragment extends BaseFragment {
             FragmentManager fragmentManager = getFragmentManager();
 
             if (fragment != null) {
-                fragment.onActivityResult(1, Activity.RESULT_OK, new Intent().putExtra(DeviceHolder.class.getSimpleName(), device.getName()));
+                fragment.onActivityResult(
+                        Constants.REQUEST_EDIT_DEVICE,
+                        Activity.RESULT_OK,
+                        new Intent().putExtra(DeviceHolder.class.getSimpleName(), device.getName()));
             }
 
             if (fragmentManager != null) {

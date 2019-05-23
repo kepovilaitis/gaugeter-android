@@ -37,15 +37,14 @@ public class EditAccountFragment extends BaseFragment {
 
         setTitle(R.string.title_edit_account);
 
-        main.<TextView>findViewById(R.id.textUserId).setText(_userInfo.getUserId());
-        _passwordEdit = main.findViewById(R.id.editPassword);
-        _repeatPasswordEdit = main.findViewById(R.id.editRepeatPassword);
-
         _preferencesController =  new PreferencesController(_context);
-
         _userInfo = new UserInfoHolder();
         _userInfo.setUserId(_preferencesController.getUserId());
         _userInfo.setMeasurementSystem(_preferencesController.getUserMeasurementSystem());
+
+        main.<TextView>findViewById(R.id.textUserId).setText(_userInfo.getUserId());
+        _passwordEdit = main.findViewById(R.id.editPassword);
+        _repeatPasswordEdit = main.findViewById(R.id.editRepeatPassword);
 
         Spinner spinner = main.findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(_context, R.array.measurement_systems_array, android.R.layout.simple_spinner_item);
