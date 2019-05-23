@@ -33,7 +33,7 @@ public class JobsListAdapter extends BaseListAdapter<JobHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_device, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_device, parent, false));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class JobsListAdapter extends BaseListAdapter<JobHolder> {
 
         holder.itemView.setSelected(_selectedPosition == position);
         holder.progressBar.setVisibility(_selectedPosition == position ? View.VISIBLE : View.GONE);
-        holder.textPrimary.setText(Utils.getFormattedDate(job.getDateCreated()));
+        holder.textPrimary.setText(Utils.getFormattedDateTime(job.getDateCreated()));
         holder.textSecondary.setText(job.getDevice().getName());
     }
 
@@ -82,7 +82,7 @@ public class JobsListAdapter extends BaseListAdapter<JobHolder> {
                     new AlertDialog.Builder(_context)
                             .setTitle(R.string.title_remove_job)
                             .setPositiveButton(R.string.yes, new DialogPositiveClickListener(_selectedPosition))
-                            .setNegativeButton(R.string.no, null)
+                            .setNegativeButton(R.string.no, _dialogNegativeClickListener)
                             .setMessage(R.string.dialog_remove_job)
                             .create()
                             .show();

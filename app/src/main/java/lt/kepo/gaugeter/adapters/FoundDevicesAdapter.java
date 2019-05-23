@@ -23,7 +23,7 @@ public class FoundDevicesAdapter extends BaseListAdapter<DeviceHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_device, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_device, parent, false));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class FoundDevicesAdapter extends BaseListAdapter<DeviceHolder> {
                     new AlertDialog.Builder(_context)
                             .setTitle(R.string.title_add_device)
                             .setPositiveButton(R.string.yes, new DialogPositiveClickListener())
-                            .setNegativeButton(R.string.no, null)
+                            .setNegativeButton(R.string.no, _dialogNegativeClickListener)
                             .setMessage(_context.getResources().getString(R.string.dialog_add_device, _list.get(_selectedPosition).getName()))
                             .create()
                             .show();

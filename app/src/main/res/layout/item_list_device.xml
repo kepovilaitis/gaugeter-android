@@ -9,7 +9,7 @@
     android:layout_marginBottom="3dp"
     android:layout_marginStart="5dp"
     android:layout_marginEnd="5dp"
-    app:cardCornerRadius="5dp">
+    app:cardCornerRadius="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
         android:paddingTop="16dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:background="@color/white"
+        android:background="@android:color/white"
         android:layout_alignParentTop="true">
 
         <ImageView
@@ -38,7 +38,6 @@
                 android:id="@id/textPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="32dp"
-                android:textColor="@android:color/black"
                 android:textSize="@dimen/text_size_very_big"
                 android:layout_gravity="top"
                 android:fontFamily="@assets/font/worksans_regular"/>
@@ -47,7 +46,6 @@
                 android:id="@id/textSecondary"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:textColor="@android:color/black"
                 android:textSize="@dimen/text_size_small"/>
 
         </LinearLayout>

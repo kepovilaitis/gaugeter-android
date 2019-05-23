@@ -1,77 +1,89 @@
 package lt.kepo.gaugeter.fragments;
 
-import android.content.Context;
+import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Button;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+import lombok.AllArgsConstructor;
 import lt.kepo.gaugeter.R;
-import lt.kepo.gaugeter.activities.MainActivity;
 import lt.kepo.gaugeter.adapters.JobsListAdapter;
 import lt.kepo.gaugeter.holders.JobHolder;
 import lt.kepo.gaugeter.interfaces.OnItemClickListener;
 import lt.kepo.gaugeter.network.BaseResponse;
-import lt.kepo.gaugeter.network.HttpClient;
 import lt.kepo.gaugeter.tools.Utils;
 
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ViewById;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-@EFragment(R.layout.fragment_jobs_by_date)
 public class JobsByDateFragment extends BaseFragment {
 
-    @ViewById(R.id.textStart) TextView _textStart;
-    @ViewById(R.id.textEnd) TextView _textEnd;
-    @ViewById(R.id.recyclerView) RecyclerView _jobsListView;
-    @ViewById(R.id.btn) Button _btnGetJobs;
-
-    private Context _context;
     private JobsListAdapter _jobsListAdapter;
+    private long _dateStartMillis;
+    private long _dateEndMillis;
 
     private List<JobHolder> _jobs = new ArrayList<>();
-    private HttpClient _httpClient = HttpClient.getInstance();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        _context = getContext();
     }
 
-    @AfterViews
-    void setUpViews() {
-        MainActivity mainActivity = (MainActivity) getActivity();
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View main = inflater.inflate(R.layout.fragment_jobs_by_date, container, false);
 
-        if (mainActivity != null && mainActivity.isActive()) {
-            mainActivity.setTitle(R.string.title_jobs_by_date);
-        }
+        setTitle(R.string.title_jobs_by_date);
 
-        long searchDateStart = System.currentTimeMillis() - 259200000;
-        long searchDateEnd = System.currentTimeMillis();
+        TextView textStart = main.findViewById(R.id.textStart);
+        TextView textEnd = main.findViewById(R.id.textEnd);
+        LinearLayout dateStartButton = main.findViewById(R.id.btnDateStart);
+        LinearLayout dateEndButton = main.findViewById(R.id.btnDateEnd);
+        RecyclerView jobsListView = main.findViewById(R.id.recyclerView);
 
-        _textStart.setText(Utils.getFormattedDate(searchDateStart));
-        _textEnd.setText(Utils.getFormattedDate(searchDateEnd));
+        _dateStartMillis = System.currentTimeMillis() - 259200000;
+        _dateEndMillis = System.currentTimeMillis();
 
-        _httpClient.getJobsByDate(searchDateStart, searchDateEnd)
+        textStart.setText(Utils.getFormattedDate(_dateStartMillis));
+        textEnd.setText(Utils.getFormattedDate(_dateEndMillis));
+
+        dateStartButton.setOnClickListener(new DatePickerClickListener(_dateStartMillis, textStart));
+        dateEndButton.setOnClickListener(new DatePickerClickListener(_dateEndMillis, textEnd));
+
+        jobsListView.setLayoutManager(new LinearLayoutManager(_context));
+        _jobsListAdapter = new JobsListAdapter(_jobs, _context, _getJobClickListener);
+        jobsListView.setAdapter(_jobsListAdapter);
+
+        _fab = getFab();
+        _fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_search, null));
+        _fab.setOnClickListener(_fabClickListener);
+        _fab.show();
+
+        executeGetJobsRequest();
+
+        return main;
+    }
+
+    private void executeGetJobsRequest() {
+        _httpClient.getJobsByDate(_dateStartMillis, _dateEndMillis)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new GetJobsResponse());
-
-        _jobsListView.setLayoutManager(new LinearLayoutManager(_context));
-        _jobsListAdapter = new JobsListAdapter(_jobs, _context, _getJobClickListener);
-        _jobsListView.setAdapter(_jobsListAdapter);
     }
 
     private OnItemClickListener _getJobClickListener = new OnItemClickListener<JobHolder>() {
@@ -83,6 +95,28 @@ public class JobsByDateFragment extends BaseFragment {
                     .subscribe(new GetJobResponse());
         }
     };
+
+    private OnClickListener _fabClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            executeGetJobsRequest();
+        }
+    };
+
+    private class GetJobsResponse extends BaseResponse<List<JobHolder>> {
+        GetJobsResponse() {
+            super(JobsByDateFragment.this);
+        }
+
+        @Override
+        public void onSuccess(List<JobHolder> jobs) {
+            super.onSuccess(jobs);
+
+            _jobs.clear();
+            _jobs.addAll(jobs);
+            _jobsListAdapter.notifyDataSetChanged();
+        }
+    }
 
     private class GetJobResponse extends BaseResponse<JobHolder> {
         GetJobResponse() {
@@ -103,7 +137,7 @@ public class JobsByDateFragment extends BaseFragment {
                 Bundle args = new Bundle();
                 args.putSerializable(JobHolder.class.getSimpleName(), job);
 
-                CompletedJobFragment_ completedJobFragment = new CompletedJobFragment_();
+                CompletedJobFragment completedJobFragment = new CompletedJobFragment();
                 completedJobFragment.setArguments(args);
 
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -114,18 +148,32 @@ public class JobsByDateFragment extends BaseFragment {
         }
     }
 
-    private class GetJobsResponse extends BaseResponse<List<JobHolder>> {
-        GetJobsResponse() {
-            super(JobsByDateFragment.this);
-        }
+    @AllArgsConstructor
+    private class DatePickerClickListener implements OnClickListener {
+        private long _dateMillis;
+        private TextView _text;
 
         @Override
-        public void onSuccess(List<JobHolder> jobs) {
-            super.onSuccess(jobs);
+        public void onClick(View v) {
+            final Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(_dateMillis);
 
-            _jobs.clear();
-            _jobs.addAll(jobs);
-            _jobsListAdapter.notifyDataSetChanged();
+            new DatePickerDialog(
+                    _context,
+                    new DatePickerDialog.OnDateSetListener() {
+
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            calendar.set(year, monthOfYear, dayOfMonth);
+
+                            _dateMillis = calendar.getTimeInMillis();
+                            _text.setText(Utils.getFormattedDate(_dateMillis));
+                        }
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            ).show();
         }
     }
 }

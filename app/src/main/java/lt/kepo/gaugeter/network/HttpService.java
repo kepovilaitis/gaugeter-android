@@ -6,6 +6,7 @@ import lt.kepo.gaugeter.holders.JobHolder;
 
 import io.reactivex.Single;
 
+import lt.kepo.gaugeter.holders.UserInfoHolder;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -41,4 +42,12 @@ public interface HttpService {
 
     @GET("/api/jobs/GetLast")
     Single<JobHolder> getLast();
+
+    @PUT("api/users/Update")
+    @Headers({"Content-Type: application/json"})
+    Single<UserInfoHolder> updateUser(@Body UserInfoHolder userInfo);
+
+    @PUT("api/devices/Update")
+    @Headers({"Content-Type: application/json"})
+    Single<DeviceHolder> updateDevice(@Body DeviceHolder device);
 }

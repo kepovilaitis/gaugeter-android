@@ -11,7 +11,7 @@ public class ToastNotifier {
         Toast.makeText(context, getHttpErrorMessageText(statusCode), Toast.LENGTH_LONG).show();
     }
 
-    public static void showBluetoothError(Context context, int messageId) {
+    public static void showError(Context context, int messageId) {
         Toast.makeText(context, messageId, Toast.LENGTH_LONG).show();
     }
 

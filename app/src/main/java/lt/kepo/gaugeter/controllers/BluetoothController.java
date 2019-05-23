@@ -28,6 +28,7 @@ import lt.kepo.gaugeter.tools.ByteParser;
 public class BluetoothController {
     private static final String HC_05_PIN = "1234";
     private static final String HC_05_DEFAULT_NAME = "HC-05";
+        private static final String REMOVE_BOND_METHOD_NAME = "removeBond";
 
     @Getter private static BluetoothController _instance;
     @Getter private ReadLiveDataThread _liveDataThread;
@@ -119,7 +120,7 @@ public class BluetoothController {
             BluetoothDevice device = _adapter.getRemoteDevice(bluetoothAddress);
 
             device.getClass()
-                    .getMethod("removeBond", (Class[]) null)
+                    .getMethod(REMOVE_BOND_METHOD_NAME, (Class[]) null)
                     .invoke(device, (Object[]) null);
         } catch (Exception ignore) { }
     }

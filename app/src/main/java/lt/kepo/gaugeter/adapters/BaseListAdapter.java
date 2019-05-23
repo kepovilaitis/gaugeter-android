@@ -1,6 +1,8 @@
 package lt.kepo.gaugeter.adapters;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -43,6 +45,12 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<BaseListAd
         notifyDataSetChanged();
     }
 
+    DialogInterface.OnClickListener _dialogNegativeClickListener = new OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            stopProgress();
+        }
+    };
 
     abstract class ViewHolder extends RecyclerView.ViewHolder {
         TextView textPrimary;

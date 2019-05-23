@@ -20,6 +20,10 @@ public class Utils {
     }
 
     public static String getFormattedDate(long timestamp){
+        return DateFormat.format("dd-MM-yyyy", timestamp).toString();
+    }
+
+    public static String getFormattedDateTime(long timestamp){
         return DateFormat.format("dd-MM-yyyy kk:mm", timestamp).toString();
     }
 }

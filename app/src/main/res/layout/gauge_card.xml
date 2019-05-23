@@ -36,7 +36,6 @@
             android:text="@string/text_oil_pressure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
             android:textSize="25sp"
             android:layout_alignParentStart="true"
             android:fontFamily="@assets/font/worksans_regular"/>
@@ -45,7 +44,6 @@
             android:id="@id/value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
             android:textSize="25sp"
             android:layout_toEndOf="@id/gaugeText"
             android:fontFamily="@assets/font/worksans_regular"/>
@@ -55,7 +53,6 @@
             android:text="@string/bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
             android:textSize="25sp"
             android:layout_toEndOf="@id/value"
             android:fontFamily="@assets/font/worksans_regular"/>
@@ -70,7 +67,7 @@
     </RelativeLayout>
 
     <com.github.mikephil.charting.charts.LineChart
-        android:id="@id/gaugeChart"
+        android:id="@id/chart"
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:background="@drawable/chart_background"

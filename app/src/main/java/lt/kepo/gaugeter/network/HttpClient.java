@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 
+import lt.kepo.gaugeter.holders.UserInfoHolder;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -116,4 +117,11 @@ public class HttpClient {
         return _httpService.getLast();
     }
 
+    public Single<UserInfoHolder> updateUser(UserInfoHolder userInfo) {
+        return _httpService.updateUser(userInfo);
+    }
+
+    public Single<DeviceHolder> updateDevice(DeviceHolder device) {
+        return _httpService.updateDevice(device);
+    }
 }

@@ -1,6 +1,5 @@
 package lt.kepo.gaugeter.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
@@ -18,7 +17,6 @@ import android.widget.EditText;
 import lombok.AllArgsConstructor;
 
 import lt.kepo.gaugeter.R;
-import lt.kepo.gaugeter.activities.MainActivity;
 import lt.kepo.gaugeter.adapters.FoundDevicesAdapter;
 import lt.kepo.gaugeter.constants.Enums.CONNECTION_STATUS;
 import lt.kepo.gaugeter.controllers.BluetoothController;
@@ -26,7 +24,6 @@ import lt.kepo.gaugeter.adapters.DevicesListAdapter;
 import lt.kepo.gaugeter.holders.DeviceHolder;
 import lt.kepo.gaugeter.interfaces.OnItemClickListener;
 import lt.kepo.gaugeter.network.BaseResponse;
-import lt.kepo.gaugeter.network.HttpClient;
 import lt.kepo.gaugeter.tools.ToastNotifier;
 
 import io.reactivex.SingleObserver;
@@ -42,18 +39,17 @@ public class DevicesFragment extends BaseFragment {
     private BluetoothController _bluetoothController;
     private DevicesListAdapter _devicesListAdapter;
     private FoundDevicesAdapter _foundDevicesAdapter;
-    private Context _context;
     private Disposable _statusDisposable;
 
     private List<DeviceHolder> _devices = new ArrayList<>();
     private List<DeviceHolder> _foundDevices = new ArrayList<>();
-    private HttpClient _httpClient = HttpClient.getInstance();
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-        _context = getContext();
+        setHasOptionsMenu(true);
+
         _bluetoothController = BluetoothController.getInstance();
         _bluetoothController.setDevice(null);
     }
@@ -62,15 +58,9 @@ public class DevicesFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View main = inflater.inflate(R.layout.fragment_devices, container, false);
 
-        setHasOptionsMenu(true);
+        setTitle(R.string.app_name);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-
-        if (mainActivity != null && mainActivity.isActive()) {
-            mainActivity.setTitle(R.string.app_name);
-        }
-
-        main.<EditText>findViewById(R.id.search).addTextChangedListener(_queryTextListener);
+        main.<EditText>findViewById(R.id.filter).addTextChangedListener(_queryTextListener);
         RecyclerView devicesList = main.findViewById(R.id.recyclerViewPairedDevices);
         RecyclerView foundDevicesList = main.findViewById(R.id.recyclerViewFoundDevices);
 
@@ -82,7 +72,10 @@ public class DevicesFragment extends BaseFragment {
         _foundDevicesAdapter = new FoundDevicesAdapter(_foundDevices, _context, _bondWithDeviceClickListener);
         foundDevicesList.setAdapter(_foundDevicesAdapter);
 
-        main.findViewById(R.id.btnSearch).setOnClickListener(_discoverDevicesClickListener);
+        _fab = getFab();
+        _fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_bluetooth_scan, null));
+        _fab.setOnClickListener(_discoverDevicesClickListener);
+        _fab.show();
 
         _httpClient
                 .getUserDevices()
@@ -160,7 +153,7 @@ public class DevicesFragment extends BaseFragment {
                 case DISCONNECTED:
                     stopProgress();
                     _devicesListAdapter.stopProgress();
-                    ToastNotifier.showBluetoothError(_context, R.string.message_connection_closed);
+                    ToastNotifier.showError(_context, R.string.message_connection_closed);
 
                     break;
 
@@ -169,7 +162,7 @@ public class DevicesFragment extends BaseFragment {
 
                     if (fragmentManager != null) {
                         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.mainContent, new TelemDataFragment_());
+                        fragmentTransaction.replace(R.id.mainContent, new TelemDataFragment());
                         fragmentTransaction.addToBackStack(null);
                         fragmentTransaction.commit();
                     }
@@ -253,7 +246,7 @@ public class DevicesFragment extends BaseFragment {
         @Override
         public void onError(Throwable e) {
             stopProgress();
-            ToastNotifier.showBluetoothError(_context, R.string.error_bluetooth);
+            ToastNotifier.showError(_context, R.string.error_bluetooth);
         }
     }
 
@@ -281,7 +274,7 @@ public class DevicesFragment extends BaseFragment {
         @Override
         public void onError(Throwable e) {
             _devicesListAdapter.stopProgress();
-            ToastNotifier.showBluetoothError(_context, R.string.error_bluetooth_could_not_bond);
+            ToastNotifier.showError(_context, R.string.error_bluetooth_could_not_bond);
         }
     }
 }

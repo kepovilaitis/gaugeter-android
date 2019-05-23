@@ -13,11 +13,6 @@
         <item>ru_RU</item>
     </string-array>
 
-    <string-array name="measurement_system_values">
-        <item>Metric</item>
-        <item>Imperial</item>
-    </string-array>
-
     <string-array name="gauges_values">
         <item>Oil pressure</item>
         <item>Oil temperature</item>
@@ -32,6 +27,11 @@
         <item>Oil temperature</item>
         <item>Water temperature</item>
         <item>Charge</item>
+    </string-array>
+
+    <string-array name="measurement_systems_array">
+        <item>Metric</item>
+        <item>Imperial</item>
     </string-array>
 
 </resources>

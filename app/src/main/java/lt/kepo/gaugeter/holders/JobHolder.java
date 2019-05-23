@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Setter
 @Getter
-public class JobHolder implements Serializable {
+public class JobHolder implements Serializable{
     public static final int ONGOING = 0;
     public static final int FINISHED = 1;
 

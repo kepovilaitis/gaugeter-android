@@ -10,7 +10,7 @@
 
     <item
         android:id="@id/menuComplete"
-        android:icon="@drawable/ic_complete"
+        android:icon="@drawable/ic_complete_white"
         android:title="@string/complete"
         app:showAsAction="ifRoom"/>
 </menu>

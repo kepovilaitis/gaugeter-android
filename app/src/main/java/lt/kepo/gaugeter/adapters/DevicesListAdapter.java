@@ -21,8 +21,8 @@ import lt.kepo.gaugeter.controllers.BluetoothController;
 import lt.kepo.gaugeter.holders.DeviceHolder;
 import lt.kepo.gaugeter.interfaces.OnItemClickListener;
 import lt.kepo.gaugeter.network.HttpClient;
-
 import lt.kepo.gaugeter.tools.ToastNotifier;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,7 +38,7 @@ public class DevicesListAdapter extends BaseListAdapter<DeviceHolder> implements
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_device, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_device, parent, false));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class DevicesListAdapter extends BaseListAdapter<DeviceHolder> implements
 
     @Override
     public int getItemCount() {
-        return _list.size();
+        return _filteredDevices.size();
     }
 
     @Override
@@ -127,7 +127,7 @@ public class DevicesListAdapter extends BaseListAdapter<DeviceHolder> implements
                     new AlertDialog.Builder(_context)
                             .setTitle(R.string.title_remove_device)
                             .setPositiveButton(R.string.yes, new DialogPositiveClickListener(_selectedPosition))
-                            .setNegativeButton(R.string.no, null)
+                            .setNegativeButton(R.string.no, _dialogNegativeClickListener)
                             .setMessage(R.string.dialog_remove_device)
                             .create()
                             .show();

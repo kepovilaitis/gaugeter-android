@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@id/menuDevices"
+        android:icon="@drawable/ic_chip"
+        android:title="@string/title_devices"/>
+
+    <item
+        android:id="@id/menuJobsByDate"
+        android:icon="@drawable/ic_calendar"
+        android:title="@string/jobs_by_date"/>
+
+    <item
+        android:id="@id/menuAccountSettings"
+        android:icon="@drawable/ic_account"
+        android:title="@string/menu_account_settings"/>
+
+    <item
+        android:id="@id/menuLogout"
+        android:icon="@drawable/ic_logout"
+        android:title="@string/logout"/>
+
+</menu>

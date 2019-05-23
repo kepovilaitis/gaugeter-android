@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:background="@drawable/input_field_background"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:focusableInTouchMode="true">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_account"
+            android:layout_gravity="center_vertical|end"/>
+
+        <TextView
+            android:id="@id/textUserId"
+            android:layout_width="0dp"
+            android:layout_weight="7"
+            android:layout_height="match_parent"
+            android:textCursorDrawable="@drawable/text_cursor"
+            android:textSize="@dimen/text_size_big"
+            android:maxLines="1"
+            android:gravity="center_vertical"
+            android:background="@null"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:background="@drawable/input_field_background"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:focusableInTouchMode="true">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_password"
+            android:layout_gravity="center_vertical|end"/>
+
+        <EditText
+            android:id="@id/editPassword"
+            android:layout_width="0dp"
+            android:layout_weight="7"
+            android:layout_height="match_parent"
+            android:textCursorDrawable="@drawable/text_cursor"
+            android:textSize="@dimen/text_size_big"
+            android:hint="@string/hint_password"
+            android:maxLines="1"
+            android:inputType="textPassword"
+            android:background="@null"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:background="@drawable/input_field_background"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:focusableInTouchMode="true">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_password"
+            android:layout_gravity="center_vertical|end"/>
+
+        <EditText
+            android:id="@id/editRepeatPassword"
+            android:layout_width="0dp"
+            android:layout_weight="7"
+            android:layout_height="match_parent"
+            android:textCursorDrawable="@drawable/text_cursor"
+            android:textSize="@dimen/text_size_big"
+            android:hint="@string/hint_repeat_password"
+            android:maxLines="1"
+            android:inputType="textPassword"
+            android:background="@null"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:background="@drawable/input_field_background"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:focusableInTouchMode="true">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_measurement_system"
+            android:layout_gravity="center_vertical|end"/>
+
+        <Spinner
+            android:id="@id/spinner"
+            android:layout_width="0dp"
+            android:layout_weight="7"
+            android:layout_height="match_parent"
+            android:spinnerMode="dropdown"
+            android:backgroundTint="@android:color/black"
+            android:dropDownVerticalOffset="50dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

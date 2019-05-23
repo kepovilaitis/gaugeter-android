@@ -1,89 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:background="@drawable/search_bar_background"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        android:focusableInTouchMode="true"
-        android:gravity="center">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_calendar"
-            android:tint="@android:color/black"
-            android:layout_gravity="center_vertical|end"/>
-
-        <TextView
-            android:id="@id/textStart"
-            android:layout_width="0dp"
-            android:layout_weight="7"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size_big"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center">
+
+            <LinearLayout
+                android:id="@id/btnDateStart"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:background="@drawable/input_field_background"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_calendar"
+                    android:layout_gravity="center_vertical|end"/>
+
+                <TextView
+                    android:id="@id/textStart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_big"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="20dp"
+                android:layout_height="2dp"
+                android:layout_gravity="center"
+                android:background="#000000"
+                android:layout_margin="16dp"/>
+
+            <LinearLayout
+                android:id="@id/btnDateEnd"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:background="@drawable/input_field_background"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_calendar"
+                    android:layout_gravity="center_vertical|end"/>
+
+                <TextView
+                    android:id="@id/textEnd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_big"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginTop="8dp"
+            android:choiceMode="singleChoice"/>
 
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:background="@drawable/search_bar_background"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        android:focusableInTouchMode="true"
-        android:gravity="center">
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_calendar"
-            android:tint="@android:color/black"
-            android:layout_gravity="center_vertical|end"/>
-
-        <TextView
-            android:id="@id/textEnd"
-            android:layout_width="0dp"
-            android:layout_weight="7"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size_big"/>
-
-    </LinearLayout>
-
-
-    <Button
-        android:id="@id/btn"
-        android:background="@drawable/search_button_background"
-        android:layout_gravity="center"
-        android:layout_width="200dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="20dp"
-        android:text="@string/search"/>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:nestedScrollingEnabled="false"
-        android:layout_marginTop="20dp"
-        android:choiceMode="singleChoice"/>
-
-</LinearLayout>
+</android.support.v4.widget.NestedScrollView>

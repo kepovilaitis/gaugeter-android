@@ -30,16 +30,12 @@
         </activity>
 
         <activity android:name="lt.kepo.gaugeter.activities.MainActivity"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden">
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
 
-        </activity>
-
-        <activity android:name="lt.kepo.gaugeter.activities.SettingsActivity"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden">
         </activity>
 
     </application>

@@ -44,7 +44,7 @@ public class LoginActivity extends BaseActivity {
             setContentView(R.layout.activity_login);
 
             _progressBar = findViewById(R.id.progressBar);
-            _userId = findViewById(R.id.editUsername);
+            _userId = findViewById(R.id.editUserId);
             _password = findViewById(R.id.editPassword);
 
             findViewById(R.id.btnSubmit).setOnClickListener(_loginClickListener);
@@ -90,11 +90,15 @@ public class LoginActivity extends BaseActivity {
 
         @Override
         public void onSuccess(LoginHolder loginHolder) {
+            UserInfoHolder user = loginHolder.getUser();
+
             _preferencesController.setEditorValue(Constants.LOGGED_IN, true);
-            _preferencesController.setEditorValue(Constants.USER_ID, loginHolder.getUser().getUserId());
+            _preferencesController.setEditorValue(Constants.USER_ID, user.getUserId());
             _preferencesController.setEditorValue(Constants.USER_TOKEN, loginHolder.getToken());
+            _preferencesController.setEditorValue(Constants.USER_MEASUREMENT_SYSTEM, user.getMeasurementSystem());
 
             _httpClient.setUserToken(loginHolder.getToken());
+
             stopProgress();
             startMainActivity();
         }

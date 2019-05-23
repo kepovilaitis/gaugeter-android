@@ -6,6 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
 import lt.kepo.gaugeter.constants.Constants;
+import lt.kepo.gaugeter.constants.Enums.MEASUREMENT_SYSTEM;
 import lt.kepo.gaugeter.constants.PreferenceKeys;
 
 import lombok.Getter;
@@ -59,7 +60,11 @@ public class PreferencesController extends PreferenceKeys {
     }
 
     public String getUserId() {
-        return _preferences.getString(Constants.USER_ID, "userId");
+        return _preferences.getString(Constants.USER_ID, "User Id");
+    }
+
+    public int getUserMeasurementSystem() {
+        return _preferences.getInt(Constants.USER_MEASUREMENT_SYSTEM, Constants.MEASUREMENET_SYSTEM_METRIC);
     }
 
     public String getUserToken() {

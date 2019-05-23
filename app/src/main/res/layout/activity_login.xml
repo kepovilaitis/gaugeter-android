@@ -53,7 +53,7 @@
             android:layout_gravity="center_vertical|end"/>
 
         <EditText
-            android:id="@id/editUsername"
+            android:id="@id/editUserId"
             android:layout_width="0dp"
             android:layout_weight="7"
             android:layout_height="match_parent"
@@ -110,7 +110,7 @@
     <Button
         android:id="@id/btnSubmit"
         android:text="@string/login"
-        android:background="@drawable/search_bar_background"
+        android:background="@drawable/input_field_background"
         android:layout_width="160dp"
         android:layout_height="40dp"
         android:layout_marginTop="24dp"

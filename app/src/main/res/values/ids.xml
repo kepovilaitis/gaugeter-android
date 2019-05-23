@@ -10,16 +10,22 @@
     <item type="id" name="textPrimary" />
     <item type="id" name="textSecondary" />
     <item type="id" name="textAddress" />
-    <item type="id" name="imageView" />
     <item type="id" name="value" />
     <item type="id" name="units" />
+    <item type="id" name="chart"/>
+    <item type="id" name="search"/>
+    <item type="id" name="filter"/>
+    <item type="id" name="relativeLayout"/>
+    <item type="id" name="progressBar"/>
+    <item type="id" name="spinner"/>
+    <item type="id" name="imageView" />
 
     <item type="id" name="editUsernameLayout" />
     <item type="id" name="editPasswordLayout" />
 
     <item type="id" name="textView" />
     <item type="id" name="textEmail" />
-    <item type="id" name="textFullName" />
+    <item type="id" name="textUserId" />
     <item type="id" name="textStart" />
     <item type="id" name="textEnd" />
 
@@ -34,22 +40,18 @@
     <item type="id" name="gaugeCharge"/>
     <item type="id" name="gaugeView"/>
     <item type="id" name="gaugeText"/>
-    <item type="id" name="gaugeChart"/>
 
     <item type="id" name="btn" />
     <item type="id" name="btnExpand" />
     <item type="id" name="btnSearch"/>
     <item type="id" name="btnSubmit"/>
+    <item type="id" name="btnDateStart"/>
+    <item type="id" name="btnDateEnd"/>
 
-    <item type="id" name="search"/>
-    <item type="id" name="relativeLayout"/>
-    <item type="id" name="progressBar"/>
-
-
-    <item type="id" name="settingsContainer"/>
-
-    <item type="id" name="editUsername"/>
+    <item type="id" name="editTextView" />
+    <item type="id" name="editUserId"/>
     <item type="id" name="editPassword"/>
+    <item type="id" name="editRepeatPassword"/>
 
     <item type="id" name="menuSettings"/>
     <item type="id" name="menuAccountSettings"/>
@@ -57,5 +59,6 @@
     <item type="id" name="menuDeviceSettings"/>
     <item type="id" name="menuComplete"/>
     <item type="id" name="menuJobsByDate"/>
+    <item type="id" name="menuDevices"/>
 
 </resources>

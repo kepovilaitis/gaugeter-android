@@ -37,7 +37,7 @@ public class GaugeCardView extends LinearLayout {
     @ViewById(R.id.gaugeText) TextView _gaugeText;
     @ViewById(R.id.value) TextView _value;
     @ViewById(R.id.units) TextView _units;
-    @ViewById(R.id.gaugeChart) LineChart _chart;
+    @ViewById(R.id.chart) LineChart _chart;
 
     private LineData _lineData;
     private Context _context;
@@ -61,7 +61,7 @@ public class GaugeCardView extends LinearLayout {
     }
 
     @AfterViews
-    void afterViews(){
+    void setUpViews(){
         List<Entry> entries = new ArrayList<>();
 
         LineDataSet dataSet = new LineDataSet(entries, null);
@@ -133,8 +133,8 @@ public class GaugeCardView extends LinearLayout {
         axis.setDrawGridLines(true);
         axis.setGranularityEnabled(true);
         axis.setGridLineWidth(0.75f);
-        axis.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
-        axis.setGridColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+        axis.setTextColor(ContextCompat.getColor(_context, R.color.colorAccent));
+        axis.setGridColor(ContextCompat.getColor(_context, R.color.colorAccent));
         axis.setDrawLimitLinesBehindData(true);
     }
 }

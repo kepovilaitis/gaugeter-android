@@ -18,7 +18,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -27,40 +26,38 @@ import lt.kepo.gaugeter.R;
 import lt.kepo.gaugeter.constants.Constants;
 import lt.kepo.gaugeter.controllers.BluetoothController;
 import lt.kepo.gaugeter.controllers.PreferencesController;
+import lt.kepo.gaugeter.fragments.EditAccountFragment;
 import lt.kepo.gaugeter.fragments.DevicesFragment;
-import lt.kepo.gaugeter.fragments.JobsByDateFragment_;
+import lt.kepo.gaugeter.fragments.JobsByDateFragment;
 import lt.kepo.gaugeter.network.HttpClient;
 
 import lombok.Getter;
 
 public class MainActivity extends BaseActivity implements OnNavigationItemSelectedListener {
-    @Getter FloatingActionButton _fab;
-
     @Getter private boolean _isActive = false;
+
+    @Getter FloatingActionButton _fab;
 
     private DrawerLayout _menuLayout;
     private ActionBarDrawerToggle _menuToggle;
-//    private Disposable _statusDisposable;
     private BluetoothController _bluetoothController = BluetoothController.getInstance();
+    private PreferencesController _preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        setUpNavigationDrawer();
 
         _fab = findViewById(R.id.fab);
         _progressBar = findViewById(R.id.progressBar);
+        _preferences = new PreferencesController(getApplicationContext());
+
+        setUpNavigationDrawer();
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.mainContent, new DevicesFragment());
         fragmentTransaction.commit();
-
-//        _bluetoothController.getStateSubject()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(_statusObserver);
     }
 
     @Override
@@ -91,28 +88,12 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     }
 
     @Override
-    public void onDestroy() {
-//        if (_statusDisposable != null && !_statusDisposable.isDisposed()) {
-//            _statusDisposable.dispose();
-//        }
-
-        super.onDestroy();
-    }
-
-    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
         if (_menuToggle != null) {
             _menuToggle.syncState();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-
-        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -138,14 +119,25 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             return true;
         }
 
-        switch (item.getItemId()){
-            case R.id.menuJobsByDate:
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
-                FragmentManager fragmentManager = getSupportFragmentManager();
+        switch (item.getItemId()){
+            case R.id.menuDevices:
 
                 if (fragmentManager != null) {
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.mainContent, new JobsByDateFragment_());
+                    fragmentTransaction.replace(R.id.mainContent, new DevicesFragment());
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+
+                break;
+
+            case R.id.menuJobsByDate:
+
+                if (fragmentManager != null) {
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.mainContent, new JobsByDateFragment());
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
                 }
@@ -153,22 +145,24 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 break;
             case R.id.menuLogout:
 
-                new PreferencesController(getApplicationContext()).deleteSessionData();
+                _preferences.deleteSessionData();
                 HttpClient.getInstance().logout();
 
                 if (isActive()) {
-                    Intent i = new Intent(this, LoginActivity.class);
-                    startActivity(i);
+                    startActivity(new Intent(this, LoginActivity.class));
                     finish();
                 }
 
                 return true;
-            case R.id.menuSettings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-
-                return true;
             case R.id.menuAccountSettings:
+
+                if (fragmentManager != null) {
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.mainContent, new EditAccountFragment());
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+
                 return true;
         }
 
@@ -176,8 +170,12 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     }
 
     private void setUpNavigationDrawer() {
-        _menuLayout = findViewById(R.id.drawerLayout);
         NavigationView navigationView = findViewById(R.id.navigationView);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView
+                .getHeaderView(0)
+                .<TextView>findViewById(R.id.textUserId)
+                .setText(_preferences.getUserId());
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         ActionBar actionBar = getSupportActionBar();
@@ -185,10 +183,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
 
-        View headerView = navigationView.getHeaderView(0);
-        TextView navUsername = headerView.findViewById(R.id.textFullName);
-        navUsername.setText(new PreferencesController(getApplicationContext()).getUserId());
-
+        _menuLayout = findViewById(R.id.drawerLayout);
         _menuToggle = new ActionBarDrawerToggle(this, _menuLayout, R.string.menu_open, R.string.menu_close) {
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
@@ -198,10 +193,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 super.onDrawerOpened(drawerView);
             }
         };
-
         _menuLayout.addDrawerListener(_menuToggle);
-        navigationView.setNavigationItemSelectedListener(this);
-
     }
 
     private boolean menuToggle(boolean close) {
@@ -215,37 +207,4 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
         return false;
     }
-
-//    private Observer<CONNECTION_STATUS> _statusObserver = new Observer<CONNECTION_STATUS>() {
-//        @Override
-//        public void onSubscribe(Disposable d) {
-//            _statusDisposable = d;
-//        }
-//
-//        @Override
-//        public void onNext(CONNECTION_STATUS connection_status) {
-//            switch (connection_status) {
-//                case DISCONNECTED:
-////                    ToastNotifier.showBluetoothError(MainActivity.this, R.string.message_connection_closed);
-//
-//                    break;
-//                case CONNECTED:
-//
-////                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-////                    fragmentTransaction.replace(R.id.mainContent, new TelemDataFragment_());
-////                    fragmentTransaction.addToBackStack(null);
-////                    fragmentTransaction.commit();
-//
-//                    break;
-//            }
-//        }
-//
-//        @Override
-//        public void onComplete() {
-//        }
-//
-//        @Override
-//        public void onError(Throwable e) {
-//        }
-//    };
 }
