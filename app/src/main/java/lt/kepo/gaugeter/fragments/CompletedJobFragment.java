@@ -92,7 +92,7 @@ public class CompletedJobFragment extends BaseFragment {
         entries.add(new Entry(0, 0.0f));
 
         for (int i = 0; i < _job.getTelemData().size(); i++) {
-            entries.add(new Entry(i, _job.getTelemData().get(i).getOilPressure() - 30));
+            entries.add(new Entry(i, _job.getTelemData().get(i).getOilPressure()));
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "Oil Pressure");
@@ -111,7 +111,7 @@ public class CompletedJobFragment extends BaseFragment {
         entries.add(new Entry(0, 0.0f));
 
         for (int i = 0; i < _job.getTelemData().size(); i++) {
-            entries.add(new Entry(i, _job.getTelemData().get(i).getWaterTemperature() - 20));
+            entries.add(new Entry(i, _job.getTelemData().get(i).getWaterTemperature()));
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "Water Temperature");
@@ -130,7 +130,7 @@ public class CompletedJobFragment extends BaseFragment {
         entries.add(new Entry(0, 0.0f));
 
         for (int i = 0; i < _job.getTelemData().size(); i++) {
-            entries.add(new Entry(i, _job.getTelemData().get(i).getCharge() - 10));
+            entries.add(new Entry(i, _job.getTelemData().get(i).getCharge() ));
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "Charge");

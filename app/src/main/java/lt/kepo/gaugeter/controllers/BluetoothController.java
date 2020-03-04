@@ -204,6 +204,8 @@ public class BluetoothController {
         public void run() {
             _adapter.cancelDiscovery();
 
+            Log.d("Received values ", "jfgjh");
+
             try {
                 ParcelUuid[] uuids = _device.getUuids();
 
@@ -244,14 +246,15 @@ public class BluetoothController {
                         float charge = parser.parseFloat(inputStream);
                         float checksum = parser.parseFloat(inputStream);
 
-                        if (checksum == oilTemperature + oilPressure + waterTemperature + charge){
+                        if (true){
 
                             _telemDataSubject.onNext(
                                 new TelemDataHolder(
-                                    oilTemperature,
-                                    oilPressure,
-                                    waterTemperature,
-                                    charge
+                                        oilTemperature,
+                                        oilPressure,
+                                        waterTemperature,
+                                        charge,
+                                        System.currentTimeMillis()
                                 )
                             );
                         } else {

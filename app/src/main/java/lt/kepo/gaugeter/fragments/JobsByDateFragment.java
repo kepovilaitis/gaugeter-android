@@ -62,8 +62,8 @@ public class JobsByDateFragment extends BaseFragment {
         textStart.setText(Utils.getFormattedDate(_dateStartMillis));
         textEnd.setText(Utils.getFormattedDate(_dateEndMillis));
 
-        dateStartButton.setOnClickListener(new DatePickerClickListener(_dateStartMillis, textStart));
-        dateEndButton.setOnClickListener(new DatePickerClickListener(_dateEndMillis, textEnd));
+        dateStartButton.setOnClickListener(new StartDatePickerClickListener(textStart));
+        dateEndButton.setOnClickListener(new EndDatePickerClickListener(textEnd));
 
         jobsListView.setLayoutManager(new LinearLayoutManager(_context));
         _jobsListAdapter = new JobsListAdapter(_jobs, _context, _getJobClickListener);
@@ -149,14 +149,13 @@ public class JobsByDateFragment extends BaseFragment {
     }
 
     @AllArgsConstructor
-    private class DatePickerClickListener implements OnClickListener {
-        private long _dateMillis;
+    private class StartDatePickerClickListener implements OnClickListener {
         private TextView _text;
 
         @Override
         public void onClick(View v) {
             final Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(_dateMillis);
+            calendar.setTimeInMillis(_dateStartMillis);
 
             new DatePickerDialog(
                     _context,
@@ -166,8 +165,36 @@ public class JobsByDateFragment extends BaseFragment {
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                             calendar.set(year, monthOfYear, dayOfMonth);
 
-                            _dateMillis = calendar.getTimeInMillis();
-                            _text.setText(Utils.getFormattedDate(_dateMillis));
+                            _dateStartMillis = calendar.getTimeInMillis();
+                            _text.setText(Utils.getFormattedDate(_dateStartMillis));
+                        }
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            ).show();
+        }
+    }
+
+    @AllArgsConstructor
+    private class EndDatePickerClickListener implements OnClickListener {
+        private TextView _text;
+
+        @Override
+        public void onClick(View v) {
+            final Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(_dateEndMillis);
+
+            new DatePickerDialog(
+                    _context,
+                    new DatePickerDialog.OnDateSetListener() {
+
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            calendar.set(year, monthOfYear, dayOfMonth);
+
+                            _dateEndMillis = calendar.getTimeInMillis();
+                            _text.setText(Utils.getFormattedDate(_dateEndMillis));
                         }
                     },
                     calendar.get(Calendar.YEAR),

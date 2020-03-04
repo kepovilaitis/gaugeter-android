@@ -55,9 +55,12 @@ public class GaugeView extends View {
 
     public GaugeView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
         readAttrs(context, attrs, defStyleAttr);
+
         _context = context;
         _matrix = new Matrix();
+
         this.postInvalidate();
         init();
     }
@@ -80,7 +83,6 @@ public class GaugeView extends View {
     }
 
     private void init(){
-
         RectF _faceRect = new RectF(Constants.LEFT, Constants.TOP, Constants.RIGHT, Constants.BOTTOM);
         _scaleRect = new RectF(_faceRect.left + _scalePosition,
                 _faceRect.top + _scalePosition,
@@ -104,7 +106,7 @@ public class GaugeView extends View {
                 Color.DKGRAY, Color.BLACK, Shader.TileMode.CLAMP));
 
         _divisionValue = (_scaleEndValue - _scaleStartValue) / _divisions;
-        }
+    }
 
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
@@ -112,9 +114,9 @@ public class GaugeView extends View {
         final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         final int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         final int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-
         final int chosenWidth = chooseDimension(widthMode, widthSize);
         final int chosenHeight = chooseDimension(heightMode, heightSize);
+
         setMeasuredDimension(chosenWidth, chosenHeight);
     }
 
@@ -139,7 +141,7 @@ public class GaugeView extends View {
         invalidate();
     }
 
-    public void setValue(double value) {
+    public void setValue(float value) {
         _newValue = value;
         invalidate();
     }
@@ -152,9 +154,11 @@ public class GaugeView extends View {
 
         if (_newValue > _oldValue && _newValue - _oldValue >= 2){
             _oldValue += 2;
+
             return  2.0f;
         } else if (_newValue <= _oldValue && _newValue - _oldValue <= -2){
             _oldValue -= 2;
+
             return  -2.0f;
         } else {
             return 0.0f;
@@ -252,7 +256,7 @@ public class GaugeView extends View {
                 canvas.drawLine(0.5f, y1 - 0.015f, 0.5f, y3 - 0.03f, paint);
                 // Draw the text 0.15 away from the division tick
                 paint.setStyle(Paint.Style.FILL);
-                drawText(canvas, String.format(Locale.US, "%d", (int) value), 0.5f, y3 + 0.05f, paint);
+//                drawText(canvas, String.format(Locale.US, "%d", (int) value), 0.5f, y3 + 0.05f, paint);
             } else {
                 // Draw a subdivision tick
                 paint.setStrokeWidth(0.002f);

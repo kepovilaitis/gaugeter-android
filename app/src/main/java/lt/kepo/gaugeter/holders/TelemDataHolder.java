@@ -12,4 +12,5 @@ public class TelemDataHolder implements Serializable {
     private float _oilPressure;
     private float _waterTemperature;
     private float _charge;
+    private long _dateCreated;
 }

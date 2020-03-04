@@ -13,6 +13,7 @@ import com.github.mikephil.charting.components.XAxis.XAxisPosition;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.components.YAxis.YAxisLabelPosition;
 
+import lombok.Setter;
 import lt.kepo.gaugeter.R;
 import lt.kepo.gaugeter.helpers.AnimationHelper;
 
@@ -38,6 +39,8 @@ public class GaugeCardView extends LinearLayout {
     @ViewById(R.id.value) TextView _value;
     @ViewById(R.id.units) TextView _units;
     @ViewById(R.id.chart) LineChart _chart;
+
+    @Setter int _maxValue = 200;
 
     private LineData _lineData;
     private Context _context;
@@ -100,7 +103,9 @@ public class GaugeCardView extends LinearLayout {
     }
 
     public void setValue(float value){
-        _gaugeView.setValue(value);
+        float newValue = (200.0f * value) / _maxValue;
+
+        _gaugeView.setValue(newValue);
         _value.setText(String.format(Locale.US, "%5.1f", value));
 
         _lineData.addEntry(new Entry(_index++, value), 0);

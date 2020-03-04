@@ -19,7 +19,7 @@
         app:redDivisions="7"
         app:scaleEndValue="200"
         app:scaleStartValue="0"
-        app:showScaleValues="true"
+        app:showScaleValues="false"
         app:showText="false"
         app:subdivisions="4"/>
 

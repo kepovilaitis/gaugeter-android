@@ -63,10 +63,19 @@ public class TelemDataFragment extends BaseFragment {
         _waterTempGaugeCard = main.findViewById(R.id.gaugeWaterTemp);
         _chargeGaugeCard = main.findViewById(R.id.gaugeCharge);
 
+        _oilPressureGaugeCard.setMaxValue(7);
+        _oilTempGaugeCard.setMaxValue(125);
+        _waterTempGaugeCard.setMaxValue(125);
+        _chargeGaugeCard.setMaxValue(14);
+
         _oilPressureGaugeCard.setText(R.string.text_oil_pressure);
         _oilTempGaugeCard.setText(R.string.text_oil_temp);
         _waterTempGaugeCard.setText(R.string.text_water_temp);
         _chargeGaugeCard.setText(R.string.text_charge);
+
+        _oilPressureGaugeCard.setUnits(R.string.bar);
+        _oilTempGaugeCard.setUnits(R.string.degrees_celsius);
+        _waterTempGaugeCard.setUnits(R.string.degrees_celsius);
 
         switch (new PreferencesController(_context).getEditorValue(PreferenceKeys.PREFERENCE_MEASUREMENT_SYSTEM, "Metric")){
             case "Metric":
@@ -178,7 +187,7 @@ public class TelemDataFragment extends BaseFragment {
     private void updateLiveData(TelemDataHolder data) {
         if (isAdded()) {
             _oilPressureGaugeCard.setValue(data.getOilPressure());
-            _oilTempGaugeCard.setValue(data.getOilPressure());
+            _oilTempGaugeCard.setValue(data.getOilTemperature());
             _waterTempGaugeCard.setValue(data.getWaterTemperature());
             _chargeGaugeCard.setValue(data.getCharge());
         }
